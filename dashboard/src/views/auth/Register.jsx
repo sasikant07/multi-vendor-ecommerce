@@ -1,6 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { AiOutlineGithub, AiOutlineGooglePlus } from "react-icons/ai";
+import { FiFacebook } from "react-icons/fi";
+import { CiTwitter } from "react-icons/ci";
 
 const Register = () => {
+  const [state, setState] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const inputHandle = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const submit = (e) => {
+    e.preventDefault();
+    console.log(state);
+  }
+
   return (
     <div className="min-w-full min-h-screen bg-[#161d31] flex justify-center items-center">
       <div className="w-[350px] text-[#d0d2d6] p-2">
@@ -9,7 +31,7 @@ const Register = () => {
           <p className="text-sm mb-3">
             Please register to your account and start your business
           </p>
-          <form action="">
+          <form onSubmit={submit}>
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="name">Name</label>
               <input
@@ -19,6 +41,8 @@ const Register = () => {
                 placeholder="name"
                 id="name"
                 required
+                onChange={inputHandle}
+                value={state.name}
               />
             </div>
             <div className="flex flex-col w-full gap-1 mb-3">
@@ -30,6 +54,8 @@ const Register = () => {
                 placeholder="email"
                 id="email"
                 required
+                onChange={inputHandle}
+                value={state.email}
               />
             </div>
             <div className="flex flex-col w-full gap-1 mb-3">
@@ -41,19 +67,59 @@ const Register = () => {
                 placeholder="password"
                 id="password"
                 required
+                onChange={inputHandle}
+                value={state.password}
               />
             </div>
             <div className="flex items-center w-full gap-3 mb-3">
               <input
-              className="w-4 h-4 text-blue-600 overflow-hidden bg-gray-100 rounded border-gray-300 focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 overflow-hidden bg-gray-100 rounded border-gray-300 focus:ring-blue-500"
                 type="checkbox"
                 name="checkbox"
                 id="checkbox"
                 required
               />
-              <label htmlFor="password">I aggree to privacy policy & terms</label>
+              <label htmlFor="password">
+                I aggree to privacy policy & terms
+              </label>
             </div>
-            <button className="bg-blue-500 w-full hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3">Sign Up</button>
+            <button className="bg-blue-500 w-full hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3">
+              Sign Up
+            </button>
+            <div className="flex items-center mb-3 gap-3 justify-center">
+              <p>
+                Already have an account ? <Link to="/login">Login</Link>
+              </p>
+            </div>
+            <div className="w-full flex justify-center items-center mb-3">
+              <div className="w-[45%] bg-slate-700 h-[1px]"></div>
+              <div className="w-[10%] flex justify-center items-center">
+                <span className="pb-1">Or</span>
+              </div>
+              <div className="w-[45%] bg-slate-700 h-[1px]"></div>
+            </div>
+            <div className="flex justify-center items-center gap-3">
+              <div className="w-[35px] h-[35px] flex rounded-md bg-orange-700 shad  hover:shadow-orange-700/50 justify-center cursor-pointer items-center overflow-hidden">
+                <span>
+                  <AiOutlineGooglePlus />
+                </span>
+              </div>
+              <div className="w-[35px] h-[35px] flex rounded-md bg-blue-700 shad  hover:shadow-orange-700/50 justify-center cursor-pointer items-center overflow-hidden">
+                <span>
+                  <FiFacebook />
+                </span>
+              </div>
+              <div className="w-[35px] h-[35px] flex rounded-md bg-blue-400 shad  hover:shadow-orange-700/50 justify-center cursor-pointer items-center overflow-hidden">
+                <span>
+                  <CiTwitter />
+                </span>
+              </div>
+              <div className="w-[35px] h-[35px] flex rounded-md bg-gray-700 shad  hover:shadow-orange-700/50 justify-center cursor-pointer items-center overflow-hidden">
+                <span>
+                  <AiOutlineGithub />
+                </span>
+              </div>
+            </div>
           </form>
         </div>
       </div>
