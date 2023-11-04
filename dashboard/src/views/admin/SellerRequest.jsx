@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import Pagination from "../Pagination";
 
-const Sellers = () => {
+const SellerRequest = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [perPage, setPerPage] = useState(5);
@@ -35,25 +35,16 @@ const Sellers = () => {
                   No.
                 </th>
                 <th scope="col" className="py-3 px-4">
-                  Image
-                </th>
-                <th scope="col" className="py-3 px-4">
                   Name
-                </th>
-                <th scope="col" className="py-3 px-4">
-                  Shop Name
-                </th>
-                <th scope="col" className="py-3 px-4">
-                  Payment Status
                 </th>
                 <th scope="col" className="py-3 px-4">
                   Email
                 </th>
                 <th scope="col" className="py-3 px-4">
-                  Division
+                  Payment Status
                 </th>
                 <th scope="col" className="py-3 px-4">
-                  District
+                  Status
                 </th>
                 <th scope="col" className="py-3 px-4">
                   Action
@@ -62,65 +53,43 @@ const Sellers = () => {
             </thead>
             <tbody className="text-sm font-normal">
               {[1, 2, 3, 4, 5].map((d, i) => (
-                <tr key={i}>
+                <tr className="border-b border-slate-700" key={i}>
                   <td
                     scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
+                    className="py-2 px-4 font-normal whitespace-nowrap"
                   >
                     {d}
                   </td>
                   <td
                     scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
+                    className="py-2 px-4 font-normal whitespace-nowrap"
                   >
-                    <img
-                      className="w-[45px] h-[45px]"
-                      src={`http://localhost:3000/images/category/${d}.jpg`}
-                      alt=""
-                    />
+                    <span>John Doe</span>
                   </td>
                   <td
                     scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
-                  >
-                    <span>Sports</span>
-                  </td>
-                  <td
-                    scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
-                  >
-                    <span>ABC Fashion</span>
-                  </td>
-                  <td
-                    scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
-                  >
-                    <span>Pending</span>
-                  </td>
-                  <td
-                    scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
+                    className="py-2 px-4 font-normal whitespace-nowrap"
                   >
                     <span>johndoe@gmail.com</span>
                   </td>
                   <td
                     scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
+                    className="py-2 px-4 font-normal whitespace-nowrap"
                   >
-                    <span>Los Angeles</span>
+                    <span>Inactive</span>
                   </td>
                   <td
                     scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
+                    className="py-2 px-4 font-normal whitespace-nowrap"
                   >
-                    <span>Cupertino</span>
+                    <span>Pending</span>
                   </td>
                   <td
                     scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
+                    className="py-2 px-4 font-normal whitespace-nowrap"
                   >
                     <div className="flex justify-start items-center gap-4">
-                      <Link to="/admin/dashboard/seller/details/1" className="p-[6px] bg-green-500 rounded-sm hover:shadow-lg hover:shadow-yellow-500/50">
+                      <Link className="p-[6px] bg-green-500 rounded-sm hover:shadow-lg hover:shadow-yellow-500/50">
                         <FaEye />
                       </Link>
                     </div>
@@ -144,4 +113,4 @@ const Sellers = () => {
   );
 };
 
-export default Sellers;
+export default SellerRequest;

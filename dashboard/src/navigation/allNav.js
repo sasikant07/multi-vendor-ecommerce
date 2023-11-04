@@ -56,9 +56,9 @@ export const allNav = [
   },
   {
     id: 8,
-    title: "Chat Seller",
+    title: "Chat Sellers",
     icon: <CiChat1 />,
     role: "admin",
-    path: "/admin/dashboard/chat-seller",
+    path: "/admin/dashboard/chat-sellers",
   },
 ];
