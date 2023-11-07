@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { BsImages } from "react-icons/bs";
+import { IoCloseSharp } from "react-icons/io5";
 
 const initialState = {
   name: "",
@@ -39,6 +41,8 @@ const AddProduct = () => {
   const [category, setCategory] = useState("");
   const [allCategory, setAllCategory] = useState(categories);
   const [searchValue, setSearchValue] = useState("");
+  const [images, setImages] = useState([]);
+  const [imageShow, setImageShow] = useState([]);
 
   const inputHandle = (e) => {
     setState({
@@ -61,9 +65,39 @@ const AddProduct = () => {
     }
   };
 
-  //   useEffect(() => {
-  //     setAllCategory(categories);
-  //   }, []);
+  const imageHandle = (e) => {
+    const files = e.target.files;
+    const length = files.length;
+
+    if (length > 0) {
+      setImages([...images, ...files]);
+      let imageUrl = [];
+
+      for (let i = 0; i < length; i++) {
+        imageUrl.push({ url: URL.createObjectURL(files[i]) });
+      }
+      setImageShow([...imageShow, ...imageUrl]);
+    }
+  };
+
+  const changeImage = (img, index) => {
+    if (img) {
+      let tempUrl = imageShow;
+      let tempImages = images;
+
+      tempImages[index] = img;
+      tempUrl[index] = { url: URL.createObjectURL(img) };
+      setImageShow([...tempUrl]);
+      setImages([...tempImages]);
+    }
+  };
+
+  const removeImage = (i) => {
+    const filterImage = images.filter((img, index) => index !== i);
+    const filterImageUrl = imageShow.filter((img, index) => index !== i);
+    setImages(filterImage);
+    setImageShow(filterImageUrl);
+  };
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -193,7 +227,7 @@ const AddProduct = () => {
               </div>
             </div>
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
-              <div className="flex flex-col w-full gap-1">
+              <div className="flex flex-col w-full gap-1 mb-2">
                 <label htmlFor="descrition">Descrition</label>
                 <textarea
                   onChange={inputHandle}
@@ -205,6 +239,52 @@ const AddProduct = () => {
                   placeholder="Description"
                 ></textarea>
               </div>
+            </div>
+            <div className="grid lg:grid-cols-4 grid-cols-1 md:grid-cols-3 sm:grid-cols-2 sm:gap-4 md:gap-4 xs:gap-4 gap-3 w-full text-[#d0d2d6] mb-4">
+              {imageShow.map((img, i) => (
+                <div className="h-[180px] relative">
+                  <label htmlFor={i}>
+                    <img
+                      className="w-full h-full rounded-sm"
+                      src={img.url}
+                      alt=""
+                    />
+                  </label>
+                  <input
+                    onChange={(e) => changeImage(e.target.files[0], i)}
+                    type="file"
+                    id={i}
+                    className="hidden"
+                  />
+                  <span
+                    onClick={() => removeImage(i)}
+                    className="p-2 z-10 cursor-pointer bg-slate-700 hover:shadow-lg hover:shadow-slate-400/50 text-white absolute top-1 right-1 rounded-full"
+                  >
+                    <IoCloseSharp />
+                  </span>
+                </div>
+              ))}
+              <label
+                htmlFor="image"
+                className="flex justify-center items-center flex-col h-[180px] cursor-pointer border border-dashed hover:border-indigo-500 w-full text-[#d0d2d6]"
+              >
+                <span>
+                  <BsImages />
+                </span>
+                <span>Select Images</span>
+              </label>
+              <input
+                multiple
+                onChange={imageHandle}
+                className="hidden"
+                type="file"
+                id="image"
+              />
+            </div>
+            <div className="flex ">
+              <button className="bg-blue-500 hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 my-2">
+                Add Category
+              </button>
             </div>
           </form>
         </div>
