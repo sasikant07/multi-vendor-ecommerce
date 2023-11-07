@@ -101,7 +101,7 @@ export const allNav = [
     title: "Payments",
     icon: <BsCurrencyDollar />,
     role: "seller",
-    path: "/seller/dashboard/payment-request",
+    path: "/seller/dashboard/payments",
   },
   {
     id: 15,

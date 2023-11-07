@@ -283,7 +283,7 @@ const AddProduct = () => {
             </div>
             <div className="flex ">
               <button className="bg-blue-500 hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 my-2">
-                Add Category
+                Add Product
               </button>
             </div>
           </form>
