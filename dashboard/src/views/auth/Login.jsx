@@ -1,10 +1,19 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineGithub, AiOutlineGooglePlus } from "react-icons/ai";
 import { FiFacebook } from "react-icons/fi";
 import { CiTwitter } from "react-icons/ci";
+import toast from "react-hot-toast";
+import { PropagateLoader } from "react-spinners";
+import { useDispatch, useSelector } from "react-redux";
+import { overrideStyle } from "../../utils/utils";
+import { messageClear, seller_login } from "../../store/Reducers/authReducer";
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const { loader, successMessage, errorMessage } = useSelector(
+    (state) => state.auth
+  );
   const [state, setState] = useState({
     email: "",
     password: "",
@@ -13,14 +22,27 @@ const Login = () => {
   const inputHandle = (e) => {
     setState({
       ...state,
-      [e.target.name]: e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const submit = (e) => {
     e.preventDefault();
-    console.log(state);
-  }
+    dispatch(seller_login(state));
+  };
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
+
   return (
     <div className="min-w-full min-h-screen bg-[#161d31] flex justify-center items-center">
       <div className="w-[350px] text-[#d0d2d6] p-2">
@@ -56,8 +78,15 @@ const Login = () => {
                 value={state.password}
               />
             </div>
-            <button className="bg-blue-500 w-full hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3">
-              Login
+            <button
+              disabled={loader ? true : false}
+              className="bg-blue-500 w-full hover:shadow-blue-500/20 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3"
+            >
+              {loader ? (
+                <PropagateLoader cssOverride={overrideStyle} />
+              ) : (
+                "Login"
+              )}
             </button>
             <div className="flex items-center mb-3 gap-3 justify-center">
               <p>

@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineGithub, AiOutlineGooglePlus } from "react-icons/ai";
 import { FiFacebook } from "react-icons/fi";
 import { CiTwitter } from "react-icons/ci";
 import { PropagateLoader } from "react-spinners";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { overrideStyle } from "../../utils/utils";
-import { seller_register } from "../../store/Reducers/authReducer";
+import {
+  messageClear,
+  seller_register,
+} from "../../store/Reducers/authReducer";
 
 const Register = () => {
   const dispatch = useDispatch();
-  const { loader } = useSelector((state) => state.auth);
+  const { loader, successMessage, errorMessage } = useSelector(
+    (state) => state.auth
+  );
   const [state, setState] = useState({
     name: "",
     email: "",
@@ -28,6 +34,18 @@ const Register = () => {
     e.preventDefault();
     dispatch(seller_register(state));
   };
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div className="min-w-full min-h-screen bg-[#161d31] flex justify-center items-center">
