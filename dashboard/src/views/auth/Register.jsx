@@ -3,8 +3,14 @@ import { Link } from "react-router-dom";
 import { AiOutlineGithub, AiOutlineGooglePlus } from "react-icons/ai";
 import { FiFacebook } from "react-icons/fi";
 import { CiTwitter } from "react-icons/ci";
+import { PropagateLoader } from "react-spinners";
+import { useDispatch, useSelector } from "react-redux";
+import { overrideStyle } from "../../utils/utils";
+import { seller_register } from "../../store/Reducers/authReducer";
 
 const Register = () => {
+  const dispatch = useDispatch();
+  const { loader } = useSelector((state) => state.auth);
   const [state, setState] = useState({
     name: "",
     email: "",
@@ -14,14 +20,14 @@ const Register = () => {
   const inputHandle = (e) => {
     setState({
       ...state,
-      [e.target.name]: e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const submit = (e) => {
     e.preventDefault();
-    console.log(state);
-  }
+    dispatch(seller_register(state));
+  };
 
   return (
     <div className="min-w-full min-h-screen bg-[#161d31] flex justify-center items-center">
@@ -83,8 +89,15 @@ const Register = () => {
                 I aggree to privacy policy & terms
               </label>
             </div>
-            <button className="bg-blue-500 w-full hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3">
-              Sign Up
+            <button
+              disabled={loader ? true : false}
+              className="bg-blue-500 w-full hover:shadow-blue-500/20 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3"
+            >
+              {loader ? (
+                <PropagateLoader cssOverride={overrideStyle} />
+              ) : (
+                "Sign Up"
+              )}
             </button>
             <div className="flex items-center mb-3 gap-3 justify-center">
               <p>

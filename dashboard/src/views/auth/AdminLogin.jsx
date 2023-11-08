@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { admin_login, messageClear } from "../../store/Reducers/authReducer";
+import { overrideStyle } from "../../utils/utils";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -26,14 +27,6 @@ const AdminLogin = () => {
   const submit = (e) => {
     e.preventDefault();
     dispatch(admin_login(state));
-  };
-
-  const overrideStyle = {
-    display: "flex",
-    margin: "0 auto",
-    height: "24px",
-    justifyContent: "center",
-    alignItems: "center",
   };
 
   useEffect(() => {

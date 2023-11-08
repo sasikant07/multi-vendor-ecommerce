@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { IoMdClose } from "react-icons/io";
-import { FaList } from "react-icons/fa";
 
 const SellerToAdmin = () => {
   return (
@@ -19,11 +17,6 @@ const SellerToAdmin = () => {
                   <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
                 </div>
                 <h2 className="text-base text-white font-semibold]">Support</h2>
-              </div>
-              <div className="w-[35px] flex md:hidden h-[35px] rounded-sm bg-blue-500 shadow-lg hover:shadow-blue-500/50 justify-center cursor-pointer items-center text-white">
-                <span>
-                  <FaList />
-                </span>
               </div>
             </div>
             <div className="py-4">

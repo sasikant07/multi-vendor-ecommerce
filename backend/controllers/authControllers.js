@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const adminModel = require("../models/adminModel");
+const sellerModel = require("../models/sellerModel");
+const sellerCustomerModel = require("../models/chat/sellerCustomerModel");
 const { responseReturn } = require("../utils/response");
 const { createToken } = require("../utils/tokenCreate");
 
@@ -29,6 +31,33 @@ class authControllers {
         }
       } else {
         responseReturn(res, 404, { error: "Email not found" });
+      }
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  seller_register = async (req, res) => {
+    const { email, name, password } = req.body;
+
+    try {
+      const getUser = await sellerModel.findOne({ email });
+
+      if (getUser) {
+        responseReturn(res, 404, { error: "Email already exists" });
+      } else {
+        const seller = await sellerModel.create({
+          name,
+          email,
+          password: await bcrypt.hash(password, 10),
+          method: "manually",
+          shopInfo: {},
+        });
+        await sellerCustomerModel.create({
+          myId: seller._id,
+        });
+
+        responseReturn(res, 201, { message: "Register success" });
       }
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
