@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineGithub, AiOutlineGooglePlus } from "react-icons/ai";
 import { FiFacebook } from "react-icons/fi";
 import { CiTwitter } from "react-icons/ci";
@@ -11,6 +11,7 @@ import { messageClear, seller_login } from "../../store/Reducers/authReducer";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { loader, successMessage, errorMessage } = useSelector(
     (state) => state.auth
   );
@@ -35,6 +36,7 @@ const Login = () => {
     if (successMessage) {
       toast.success(successMessage);
       dispatch(messageClear());
+      navigate("/");
     }
 
     if (errorMessage) {

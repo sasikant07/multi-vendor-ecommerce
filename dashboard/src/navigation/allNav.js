@@ -1,8 +1,9 @@
-import { AiFillDashboard, AiOutlineShoppingCart } from "react-icons/ai";
+import { AiFillDashboard, AiOutlineShoppingCart, AiOutlinePlus } from "react-icons/ai";
 import { BiCategory, BiLoaderCircle } from "react-icons/bi";
 import { FiUsers, FiUser } from "react-icons/fi";
-import { BsCurrencyDollar } from "react-icons/bs";
-import { CiChat1 } from "react-icons/ci";
+import { BsCurrencyDollar, BsChat } from "react-icons/bs";
+import { CiChat1, CiDiscount1 } from "react-icons/ci";
+import { RiProductHuntLine } from "react-icons/ri";
 
 export const allNav = [
   {
@@ -71,28 +72,28 @@ export const allNav = [
   {
     id: 10,
     title: "Add Product",
-    icon: <AiFillDashboard />,
+    icon: <AiOutlinePlus />,
     role: "seller",
     path: "/seller/dashboard/add-product",
   },
   {
     id: 11,
     title: "All Product",
-    icon: <AiOutlineShoppingCart />,
+    icon: <RiProductHuntLine />,
     role: "seller",
     path: "/seller/dashboard/products",
   },
   {
     id: 12,
     title: "Discount Products",
-    icon: <BiCategory />,
+    icon: <CiDiscount1 />,
     role: "seller",
     path: "/seller/dashboard/discount-products",
   },
   {
     id: 13,
     title: "Orders",
-    icon: <FiUsers />,
+    icon: <AiOutlineShoppingCart />,
     role: "seller",
     path: "/seller/dashboard/orders",
   },
@@ -106,7 +107,7 @@ export const allNav = [
   {
     id: 15,
     title: "Chat Customer",
-    icon: <BiLoaderCircle />,
+    icon: <BsChat />,
     role: "seller",
     path: "/seller/dashboard/chat-customer",
   },
@@ -120,7 +121,7 @@ export const allNav = [
   {
     id: 17,
     title: "Profile",
-    icon: <CiChat1 />,
+    icon: <FiUser />,
     role: "seller",
     path: "/seller/dashboard/profile",
   },
