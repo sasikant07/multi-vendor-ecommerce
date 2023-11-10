@@ -9,21 +9,35 @@ const initialState = {
 };
 
 export const categoryAdd = createAsyncThunk(
-    "category/categoryAdd",
-    async ({name, image}, thunkAPI) => {
-      try {
-        const formdata = new FormData();
-        formdata.append("name", name);
-        formdata.append("image", image);
-        const { data } = await api.post("/category-add", formdata, {
-          withCredentials: true,
-        });
-        return thunkAPI.fulfillWithValue(data);
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error.response.data);
-      }
+  "category/categoryAdd",
+  async ({ name, image }, thunkAPI) => {
+    try {
+      const formdata = new FormData();
+      formdata.append("name", name);
+      formdata.append("image", image);
+      const { data } = await api.post("/category-add", formdata, {
+        withCredentials: true,
+      });
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
     }
-  );
+  }
+);
+
+export const get_category = createAsyncThunk(
+  "category/get_category",
+  async ({ perPage, page, searchValue}, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/category-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`, {
+        withCredentials: true,
+      });
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const categoryReducer = createSlice({
   name: "category",
@@ -41,7 +55,7 @@ export const categoryReducer = createSlice({
     builder.addCase(categoryAdd.fulfilled, (state, action) => {
       state.loader = false;
       state.successMessage = action.payload.message;
-      state.categories = [...state.categories, action.payload.category]
+      state.categories = [...state.categories, action.payload.category];
     });
     builder.addCase(categoryAdd.rejected, (state, action) => {
       state.loader = false;

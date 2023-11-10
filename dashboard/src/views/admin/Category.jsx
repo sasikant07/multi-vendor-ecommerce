@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { GrClose } from "react-icons/gr";
 import { BsImage } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import { PropagateLoader } from "react-spinners";
 import { overrideStyle } from "../../utils/utils";
 import Pagination from "../Pagination";
-import { categoryAdd } from "../../store/Reducers/categoryReducer";
+import {
+  categoryAdd,
+  messageClear,
+  get_category,
+} from "../../store/Reducers/categoryReducer";
+import Search from "../components/Search";
 
 const intialState = {
   name: "",
@@ -16,7 +22,9 @@ const intialState = {
 
 const Category = () => {
   const dispatch = useDispatch();
-  const { loader } = useSelector((state) => state.category);
+  const { loader, successMessage, errorMessage } = useSelector(
+    (state) => state.category
+  );
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [perPage, setPerPage] = useState(5);
@@ -38,6 +46,29 @@ const Category = () => {
     dispatch(categoryAdd(state));
   };
 
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+      setState(intialState);
+      setImageShow("");
+    }
+  }, [successMessage, errorMessage]);
+
+  useEffect(() => {
+    const obj = {
+      perPage: parseInt(perPage),
+      page: parseInt(currentPage),
+      searchValue,
+    };
+
+    dispatch(get_category(obj));
+  }, [searchValue, currentPage, perPage]);
+
   return (
     <div className="px-2 lg:px-7 pt-5">
       <div className="flex lg:hidden justify-between items-center mb-5 p-4 bg-[#283046] rounded-md">
@@ -52,21 +83,11 @@ const Category = () => {
       <div className="flex flex-wrap w-full">
         <div className="w-full lg:w-7/12">
           <div className="w-full p-4 bg-[#283046] rounded-md">
-            <div className="flex justify-between items-center">
-              <select
-                onChange={(e) => setPerPage(parseInt(e.target.value))}
-                className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
-              >
-                <option value="5">5</option>
-                <option value="15">15</option>
-                <option value="25">25</option>
-              </select>
-              <input
-                className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
-                type="text"
-                placeholder="search"
-              />
-            </div>
+            <Search
+              setPerPage={setPerPage}
+              setSearchValue={setSearchValue}
+              searchValue={searchValue}
+            />
             <div className="relative overflow-x-auto">
               <table className="w-full text-sm text-left text-[#d0d2d6]">
                 <thead className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">

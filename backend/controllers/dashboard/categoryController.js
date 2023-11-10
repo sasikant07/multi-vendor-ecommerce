@@ -1,16 +1,16 @@
 const categoryModel = require("../../models/categoryModel");
-const formidable = require("formidable");
+const formidable = require("formidable"); // to handle the FormData from frontend instead of req.body
 const { responseReturn } = require("../../utils/response");
 const cloudinary = require("cloudinary").v2;
 
 class CategoryController {
   add_category = async (req, res) => {
     const form = new formidable.IncomingForm(); // to handle the FormData from frontend instead of req.body
-    form.parse(req, async (err, fields, files) => {
+    form.parse(req, async (err, fileds, files) => {
       if (err) {
         responseReturn(res, 404, { error: "Something went wrong" });
       } else {
-        let { name } = fields;
+        let { name } = fileds;
         let { image } = files;
         name = name[0].trim();
 
@@ -23,21 +23,10 @@ class CategoryController {
           secure: true,
         });
 
-        console.log("===CN====", process.env.CLOUD_NAME);
-        console.log("===AK====", process.env.API_KEY);
-        console.log("===AS====", process.env.API_SECRET);
-
-        console.log("===NAME===", name);
-        console.log("===IMAGES===", image[0].filepath);
-        console.log("===SLUG===", slug);
-
         try {
-            console.log("=========================", cloudinary.v2.uploader.upload(image[0].filepath, { folder: 'categorys' }, (error, result)=>{
-                console.log(result, error);
-              }));
-          const result = await cloudinary.v2.uploader.upload(image[0].filepath, { folder: 'categorys' });
-
-          console.log("==RESULT=====", result);
+          const result = await cloudinary.uploader.upload(image[0].filepath, {
+            folder: "categories",
+          });
 
           if (result) {
             const category = await categoryModel.create({
@@ -49,7 +38,6 @@ class CategoryController {
               category,
               message: "Category added successfully!",
             });
-
           } else {
             responseReturn(res, 404, { error: "Image upload failed!" });
           }
@@ -59,7 +47,45 @@ class CategoryController {
       }
     });
   };
-  get_category = async (req, res) => {};
+  get_category = async (req, res) => {
+    const { page, perPage, searchValue } = req.query;
+    const skipPage = parseInt(perPage) * (parseInt(page) - 1); // 1 * (1-1) = 0
+
+    try {
+      if (searchValue) {
+        const categories = await categoryModel
+          .find({
+            $text: { $search: searchValue },
+          })
+          .skip(skipPage)
+          .limit(perPage)
+          .sort({ createdAt: -1 });
+
+        const totalCategory = await categoryModel
+          .find({ $text: { $search: searchValue } })
+          .countDocuments();
+
+        responseReturn(res, 200, {
+          totalCategory,
+          categories,
+        });
+      } else {
+        const categories = await categoryModel
+          .find({})
+          .skip(skipPage)
+          .limit(perPage)
+          .sort({ createdAt: -1 });
+      }
+      const totalCategory = await categoryModel.find({}).countDocuments();
+
+      responseReturn(res, 200, {
+        totalCategory,
+        categories,
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: "Internal server error" });
+    }
+  };
 }
 
 module.exports = new CategoryController();
