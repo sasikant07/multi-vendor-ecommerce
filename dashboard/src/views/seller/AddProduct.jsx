@@ -2,44 +2,32 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BsImages } from "react-icons/bs";
 import { IoCloseSharp } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { get_category } from "../../store/Reducers/categoryReducer";
+import { add_product } from "../../store/Reducers/productReducer";
 
 const initialState = {
   name: "",
-  descrition: "",
+  description: "",
   discount: "",
   price: "",
   brand: "",
   stock: "",
 };
 
-const categories = [
-  {
-    id: 1,
-    name: "Sports",
-  },
-  {
-    id: 2,
-    name: "Shirts",
-  },
-  {
-    id: 3,
-    name: "Shoes",
-  },
-  {
-    id: 4,
-    name: "Trousers",
-  },
-  {
-    id: 5,
-    name: "Accessories",
-  },
-];
-
 const AddProduct = () => {
+  const dispatch = useDispatch();
+  const { loader, successMessage, errorMessage, categories } = useSelector(
+    (state) => state.category
+  );
+  // const { loader, successMessage, errorMessage, categories } = useSelector(
+  //   (state) => state.product
+  // );
   const [state, setState] = useState(initialState);
   const [categoryShow, setCategoryShow] = useState(false);
   const [category, setCategory] = useState("");
-  const [allCategory, setAllCategory] = useState(categories);
+  const [allCategory, setAllCategory] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [images, setImages] = useState([]);
   const [imageShow, setImageShow] = useState([]);
@@ -99,6 +87,39 @@ const AddProduct = () => {
     setImageShow(filterImageUrl);
   };
 
+  const addProduct = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("name", state.name);
+    formData.append("description", state.description);
+    formData.append("category", category);
+    formData.append("discount", state.discount);
+    formData.append("price", state.price);
+    formData.append("brand", state.brand);
+    formData.append("stock", state.stock);
+    formData.append("shopName", "ABC Fashion");
+
+    for(let i = 0; i < images.length; i++) {
+      formData.append("images", images[i]);
+    }
+
+    dispatch(add_product(formData));
+  };
+
+  useEffect(() => {
+    dispatch(
+      get_category({
+        searchValue: "",
+        perPage: "",
+        page: "",
+      })
+    );
+  }, []);
+
+  useEffect(() => {
+    setAllCategory(categories);
+  }, [categories]);
+
   return (
     <div className="px-2 lg:px-7 pt-5">
       <div className="w-full p-4 bg-[#283046] rounded-md">
@@ -112,7 +133,7 @@ const AddProduct = () => {
           </Link>
         </div>
         <div className="">
-          <form>
+          <form onSubmit={addProduct}>
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
               <div className="flex flex-col w-full gap-1">
                 <label htmlFor="name">Product Name</label>
@@ -166,7 +187,7 @@ const AddProduct = () => {
                     />
                   </div>
                   <div className="pt-14"></div>
-                  <div className="flex justify-start items-start flex-col h-[200px] overflow-x-scrooll">
+                  <div className="flex justify-start items-start flex-col h-[200px] overflow-x-auto">
                     {allCategory.map((c, i) => (
                       <span
                         className={`px-4 py-2 hover:bg-indigo-500 hover:text-white hover:shadow-lg w-full cursor-pointer ${
@@ -195,7 +216,7 @@ const AddProduct = () => {
                   min={0}
                   name="stock"
                   id="stock"
-                  placeholder="Brand name"
+                  placeholder="Stock"
                 />
               </div>
             </div>
@@ -228,14 +249,14 @@ const AddProduct = () => {
             </div>
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
               <div className="flex flex-col w-full gap-1 mb-2">
-                <label htmlFor="descrition">Descrition</label>
+                <label htmlFor="description">Description</label>
                 <textarea
                   onChange={inputHandle}
                   rows={4}
-                  value={state.descrition}
+                  value={state.description}
                   className="px-4 py-2 w-full focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
-                  name="descrition"
-                  id="descrition"
+                  name="description"
+                  id="description"
                   placeholder="Description"
                 ></textarea>
               </div>

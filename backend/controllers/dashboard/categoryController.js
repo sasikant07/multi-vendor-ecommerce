@@ -6,11 +6,11 @@ const cloudinary = require("cloudinary").v2;
 class CategoryController {
   add_category = async (req, res) => {
     const form = new formidable.IncomingForm(); // to handle the FormData from frontend instead of req.body
-    form.parse(req, async (err, fileds, files) => {
+    form.parse(req, async (err, fields, files) => {
       if (err) {
         responseReturn(res, 404, { error: "Something went wrong" });
       } else {
-        let { name } = fileds;
+        let { name } = fields;
         let { image } = files;
         name = name[0].trim();
 
@@ -49,10 +49,13 @@ class CategoryController {
   };
   get_category = async (req, res) => {
     const { page, perPage, searchValue } = req.query;
-    const skipPage = parseInt(perPage) * (parseInt(page) - 1); // 1 * (1-1) = 0
-
+    
     try {
-      if (searchValue) {
+      let skipPage = ""
+      if (perPage && page) {
+        skipPage = parseInt(perPage) * (parseInt(page) - 1); // 1 * (1-1) = 0
+      }
+      if (searchValue && page && perPage) {
         const categories = await categoryModel
           .find({
             $text: { $search: searchValue },
@@ -69,19 +72,27 @@ class CategoryController {
           totalCategory,
           categories,
         });
-      } else {
+      } else if (searchValue === "" && page && perPage) {
         const categories = await categoryModel
           .find({})
           .skip(skipPage)
           .limit(perPage)
           .sort({ createdAt: -1 });
-      }
-      const totalCategory = await categoryModel.find({}).countDocuments();
+        const totalCategory = await categoryModel.find({}).countDocuments();
 
-      responseReturn(res, 200, {
-        totalCategory,
-        categories,
-      });
+        responseReturn(res, 200, {
+          totalCategory,
+          categories,
+        });
+      } else {
+        const categories = await categoryModel.find({}).sort({ createdAt: -1 });
+        const totalCategory = await categoryModel.find({}).countDocuments();
+
+        responseReturn(res, 200, {
+          totalCategory,
+          categories,
+        });
+      }
     } catch (error) {
       responseReturn(res, 500, { error: "Internal server error" });
     }

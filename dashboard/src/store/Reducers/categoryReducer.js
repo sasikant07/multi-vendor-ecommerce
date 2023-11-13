@@ -6,6 +6,7 @@ const initialState = {
   errorMessage: "",
   loader: false,
   categories: [],
+  totalCategory: 0,
 };
 
 export const categoryAdd = createAsyncThunk(
@@ -60,6 +61,10 @@ export const categoryReducer = createSlice({
     builder.addCase(categoryAdd.rejected, (state, action) => {
       state.loader = false;
       state.errorMessage = action.payload.error;
+    });
+    builder.addCase(get_category.fulfilled, (state, action) => {
+      state.totalCategory = action.payload.totalCategory;
+      state.categories = action.payload.categories;
     });
   },
 });
