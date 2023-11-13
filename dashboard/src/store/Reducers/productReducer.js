@@ -28,7 +28,7 @@ export const get_product = createAsyncThunk(
   async ({ perPage, page, searchValue }, thunkAPI) => {
     try {
       const { data } = await api.get(
-        `/category-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`,
+        `/product-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`,
         {
           withCredentials: true,
         }
