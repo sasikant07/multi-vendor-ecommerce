@@ -85,6 +85,22 @@ export const seller_login = createAsyncThunk(
   }
 );
 
+export const seller_profile_image_upload = createAsyncThunk(
+  "auth/seller_profile_image_upload",
+  async (image, thunkAPI) => {
+    try {
+      const { data } = await api.post("/seller-profile-image-upload", image, {
+        withCredentials: true,
+      });
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
+
 export const authReducer = createSlice({
   name: "auth",
   initialState,
@@ -136,6 +152,15 @@ export const authReducer = createSlice({
     });
     builder.addCase(get_user_info.fulfilled, (state, action) => {
       state.loader = false;
+      state.userInfo = action.payload.userInfo;
+      state.role = action.payload.userInfo.role;
+    });
+    builder.addCase(seller_profile_image_upload.pending, (state) => {
+      state.loader = true;
+    });
+    builder.addCase(seller_profile_image_upload.fulfilled, (state, action) => {
+      state.loader = false;
+      state.successMessage = action.payload.message;
       state.userInfo = action.payload.userInfo;
     });
   },

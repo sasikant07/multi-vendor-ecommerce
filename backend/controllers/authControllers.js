@@ -1,5 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const formidable = require("formidable");
+const cloudinary = require("cloudinary").v2;
 
 const adminModel = require("../models/adminModel");
 const sellerModel = require("../models/sellerModel");
@@ -112,6 +114,40 @@ class authControllers {
     } catch (error) {
       responseReturn(res, 500, { error: "Internal Server Error" });
     }
+  };
+
+  seller_profile_image_upload = async (req, res) => {
+    const form = new formidable.IncomingForm({ multiples: true });
+    const { id } = req;
+
+    form.parse(req, async (err, fields, files) => {
+      const { image } = files;
+
+      cloudinary.config({
+        cloud_name: process.env.CLOUD_NAME,
+        api_key: process.env.API_KEY,
+        api_secret: process.env.API_SECRET,
+        secure: true,
+      });
+
+      try {
+        const result = await cloudinary.uploader.upload(image[0].filepath, {
+          folder: "profile",
+        });
+
+        if (result) {
+          await sellerModel.findByIdAndUpdate(id, {
+            image: result.url,
+          });
+          const userInfo = await sellerModel.findById(id);
+          responseReturn(res, 201, { userInfo, message: "Image upload successfully!" });
+        } else {
+          responseReturn(res, 500, { error: "Image upload failed!" });
+        }
+      } catch (error) {
+        responseReturn(res, 500, { error: error.message });
+      }
+    });
   };
 }
 
