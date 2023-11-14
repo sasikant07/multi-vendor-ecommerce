@@ -1,47 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { BsImages } from "react-icons/bs";
 import { IoCloseSharp } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { PropagateLoader } from "react-spinners";
+import { overrideStyle } from "../../utils/utils";
+import toast from "react-hot-toast";
+import { get_category } from "../../store/Reducers/categoryReducer";
+import {
+  get_product,
+  messageClear,
+  update_product,
+  product_image_update,
+} from "../../store/Reducers/productReducer";
 
 const initialState = {
   name: "",
-  descrition: "",
+  description: "",
   discount: "",
   price: "",
   brand: "",
   stock: "",
 };
 
-const categories = [
-  {
-    id: 1,
-    name: "Sports",
-  },
-  {
-    id: 2,
-    name: "Shirts",
-  },
-  {
-    id: 3,
-    name: "Shoes",
-  },
-  {
-    id: 4,
-    name: "Trousers",
-  },
-  {
-    id: 5,
-    name: "Accessories",
-  },
-];
-
 const EditProduct = () => {
+  const { productId } = useParams();
+  const dispatch = useDispatch();
+  const { categories } = useSelector((state) => state.category);
+  const { product, loader, errorMessage, successMessage } = useSelector(
+    (state) => state.product
+  );
   const [state, setState] = useState(initialState);
   const [categoryShow, setCategoryShow] = useState(false);
   const [category, setCategory] = useState("");
-  const [allCategory, setAllCategory] = useState(categories);
+  const [allCategory, setAllCategory] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [images, setImages] = useState([]);
   const [imageShow, setImageShow] = useState([]);
 
   const inputHandle = (e) => {
@@ -67,25 +60,73 @@ const EditProduct = () => {
 
   const changeImage = (img, files) => {
     if (files.length > 0) {
-      
+      dispatch(
+        product_image_update({
+          oldImage: img,
+          newImage: files[0],
+          productId,
+        })
+      );
     }
+  };
+
+  const updateProduct = (e) => {
+    e.preventDefault();
+    const obj = {
+      name: state.name,
+      description: state.description,
+      discount: state.discount,
+      price: state.price,
+      brand: state.brand,
+      stock: state.stock,
+      productId: productId,
+    };
+    dispatch(update_product(obj));
   };
 
   useEffect(() => {
     setState({
-      name: "Men's Premium T-Shirt",
-      descrition: "Men's Premium T-Shirt",
-      discount: 10,
-      price: 123,
-      brand: "Nike",
-      stock: 100,
+      name: product.name,
+      description: product.description,
+      discount: product.discount,
+      price: product.price,
+      brand: product.brand,
+      stock: product.stock,
     });
-    setCategory("Shirts");
-    setImageShow([
-      "http://localhost:3000/images/admin.jpg",
-      "http://localhost:3000/images/admin.jpg",
-    ]);
+    setCategory(product.category);
+    setImageShow(product.images);
+  }, [product]);
+
+  useEffect(() => {
+    dispatch(
+      get_category({
+        searchValue: "",
+        perPage: "",
+        page: "",
+      })
+    );
   }, []);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setAllCategory(categories);
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    dispatch(get_product(productId));
+  }, [productId]);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -100,7 +141,7 @@ const EditProduct = () => {
           </Link>
         </div>
         <div className="">
-          <form>
+          <form onSubmit={updateProduct}>
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
               <div className="flex flex-col w-full gap-1">
                 <label htmlFor="name">Product Name</label>
@@ -154,8 +195,8 @@ const EditProduct = () => {
                     />
                   </div>
                   <div className="pt-14"></div>
-                  <div className="flex justify-start items-start flex-col h-[200px] overflow-x-scrooll">
-                    {allCategory.map((c, i) => (
+                  <div className="flex justify-start items-start flex-col h-[200px] overflow-x-auto">
+                    {allCategory?.map((c, i) => (
                       <span
                         className={`px-4 py-2 hover:bg-indigo-500 hover:text-white hover:shadow-lg w-full cursor-pointer ${
                           category === c.name && "bg-indigo-500"
@@ -216,23 +257,23 @@ const EditProduct = () => {
             </div>
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
               <div className="flex flex-col w-full gap-1 mb-2">
-                <label htmlFor="descrition">Descrition</label>
+                <label htmlFor="description">Description</label>
                 <textarea
                   onChange={inputHandle}
                   rows={4}
-                  value={state.descrition}
+                  value={state.description}
                   className="px-4 py-2 w-full focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
-                  name="descrition"
-                  id="descrition"
+                  name="description"
+                  id="description"
                   placeholder="Description"
                 ></textarea>
               </div>
             </div>
             <div className="grid lg:grid-cols-4 grid-cols-1 md:grid-cols-3 sm:grid-cols-2 sm:gap-4 md:gap-4 xs:gap-4 gap-3 w-full text-[#d0d2d6] mb-4">
-              {imageShow.map((img, i) => (
-                <div className="">
+              {imageShow?.map((img, i) => (
+                <div className="h-[180px]">
                   <label htmlFor={i}>
-                    <img src={img} alt="" />
+                    <img className="w-full h-full" src={img} alt="" />
                   </label>
                   <input
                     onChange={(e) => changeImage(img, e.target.files)}
@@ -244,8 +285,15 @@ const EditProduct = () => {
               ))}
             </div>
             <div className="flex ">
-              <button className="bg-blue-500 hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 my-2">
-                Update Product
+              <button
+                disabled={loader ? true : false}
+                className="bg-blue-500 w-[190px] hover:shadow-blue-500/20 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3"
+              >
+                {loader ? (
+                  <PropagateLoader color="#fff" cssOverride={overrideStyle} />
+                ) : (
+                  "Update Product"
+                )}
               </button>
             </div>
           </form>

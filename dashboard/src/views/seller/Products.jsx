@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { PropagateLoader } from "react-spinners";
 import { overrideStyle } from "../../utils/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { get_product } from "../../store/Reducers/productReducer";
+import { get_products } from "../../store/Reducers/productReducer";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const Products = () => {
       searchValue,
     };
 
-    dispatch(get_product(obj));
+    dispatch(get_products(obj));
   }, [searchValue, currentPage, perPage]);
   return (
     <div className="px-2 lg:px-7 pt-5">
