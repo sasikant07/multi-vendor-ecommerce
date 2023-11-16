@@ -140,7 +140,10 @@ class authControllers {
             image: result.url,
           });
           const userInfo = await sellerModel.findById(id);
-          responseReturn(res, 201, { userInfo, message: "Image upload successfully!" });
+          responseReturn(res, 201, {
+            userInfo,
+            message: "Image upload successfully!",
+          });
         } else {
           responseReturn(res, 500, { error: "Image upload failed!" });
         }
@@ -148,6 +151,30 @@ class authControllers {
         responseReturn(res, 500, { error: error.message });
       }
     });
+  };
+
+  profile_info_add = async (req, res) => {
+    const { shopName, division, district, subDistrict } = req.body;
+    const { id } = req;
+
+    try {
+      await sellerModel.findByIdAndUpdate(id, {
+        shopInfo: {
+          shopName,
+          division,
+          district,
+          subDistrict,
+        },
+      });
+
+      const userInfo = await sellerModel.findById(id);
+      responseReturn(res, 201, {
+        userInfo,
+        message: "Seller profile added successfully!",
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
   };
 }
 

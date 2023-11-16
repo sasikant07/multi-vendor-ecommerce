@@ -1,20 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BsImage } from "react-icons/bs";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import { FadeLoader } from "react-spinners";
+import { PropagateLoader } from "react-spinners";
+import { overrideStyle } from "../../utils/utils";
 import { useDispatch, useSelector } from "react-redux";
 import {
   seller_profile_image_upload,
   messageClear,
+  profile_info_add,
 } from "../../store/Reducers/authReducer";
+
+const initialState = {
+  shopName: "",
+  division: "",
+  district: "",
+  subDistrict: "",
+};
 
 const Profile = () => {
   const dispatch = useDispatch();
   const { userInfo, loader, successMessage } = useSelector(
     (state) => state.auth
   );
-
+  const [state, setState] = useState(initialState);
   const status = "active";
 
   const add_image = (e) => {
@@ -23,6 +33,18 @@ const Profile = () => {
       formData.append("image", e.target.files[0]);
       dispatch(seller_profile_image_upload(formData));
     }
+  };
+
+  const inputHandler = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(profile_info_add(state));
   };
 
   useEffect(() => {
@@ -115,11 +137,13 @@ const Profile = () => {
             </div>
             <div className="px-0 md:px-5 py-2">
               {!userInfo?.shopInfo ? (
-                <form>
+                <form onSubmit={handleSubmit}>
                   <div className="flex flex-col w-full gap-1 mb-3">
                     <label htmlFor="shop">Shop Name</label>
                     <input
                       className="px-4 py-2 w-full focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
+                      value={state.shopName}
+                      onChange={inputHandler}
                       type="text"
                       name="shopName"
                       id="shop"
@@ -130,6 +154,8 @@ const Profile = () => {
                     <label htmlFor="div">Division</label>
                     <input
                       className="px-4 py-2 w-full focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
+                      value={state.division}
+                      onChange={inputHandler}
                       type="text"
                       name="division"
                       id="div"
@@ -140,6 +166,8 @@ const Profile = () => {
                     <label htmlFor="district">District</label>
                     <input
                       className="px-4 py-2 w-full focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
+                      value={state.district}
+                      onChange={inputHandler}
                       type="text"
                       name="district"
                       id="district"
@@ -150,14 +178,26 @@ const Profile = () => {
                     <label htmlFor="sub">Sub District</label>
                     <input
                       className="px-4 py-2 w-full focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
+                      value={state.subDistrict}
+                      onChange={inputHandler}
                       type="text"
                       name="subDistrict"
                       id="sub"
                       placeholder="Sub-District"
                     />
                   </div>
-                  <button className="bg-blue-500 hover:shadow-blue-500/50 hover:shadow-lg text-white rounded-md px-7 py-2 my-2">
-                    Add
+                  <button
+                    disabled={loader ? true : false}
+                    className="bg-blue-500 w-[190px] hover:shadow-blue-500/20 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3"
+                  >
+                    {loader ? (
+                      <PropagateLoader
+                        color="#fff"
+                        cssOverride={overrideStyle}
+                      />
+                    ) : (
+                      "Add Info"
+                    )}
                   </button>
                 </form>
               ) : (
@@ -167,19 +207,19 @@ const Profile = () => {
                   </span>
                   <div className="flex gap-2">
                     <span>Shop Name: </span>
-                    <span>ABC Fashion</span>
+                    <span>{userInfo?.shopInfo?.shopName}</span>
                   </div>
                   <div className="flex gap-2">
                     <span>Division: </span>
-                    <span>Los Angeles</span>
+                    <span>{userInfo?.shopInfo?.division}</span>
                   </div>
                   <div className="flex gap-2">
                     <span>District: </span>
-                    <span>Los Angeles</span>
+                    <span>{userInfo?.shopInfo?.district}</span>
                   </div>
                   <div className="flex gap-2">
                     <span>Sub District: </span>
-                    <span>Cupertino</span>
+                    <span>{userInfo?.shopInfo?.subDistrict}</span>
                   </div>
                 </div>
               )}

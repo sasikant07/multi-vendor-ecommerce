@@ -99,7 +99,19 @@ export const seller_profile_image_upload = createAsyncThunk(
   }
 );
 
-
+export const profile_info_add = createAsyncThunk(
+  "auth/profile_info_add",
+  async (info, thunkAPI) => {
+    try {
+      const { data } = await api.post("/profile-info-add", info, {
+        withCredentials: true,
+      });
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const authReducer = createSlice({
   name: "auth",
@@ -159,6 +171,14 @@ export const authReducer = createSlice({
       state.loader = true;
     });
     builder.addCase(seller_profile_image_upload.fulfilled, (state, action) => {
+      state.loader = false;
+      state.successMessage = action.payload.message;
+      state.userInfo = action.payload.userInfo;
+    });
+    builder.addCase(profile_info_add.pending, (state) => {
+      state.loader = true;
+    });
+    builder.addCase(profile_info_add.fulfilled, (state, action) => {
       state.loader = false;
       state.successMessage = action.payload.message;
       state.userInfo = action.payload.userInfo;
