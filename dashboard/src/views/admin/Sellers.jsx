@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 import Pagination from "../Pagination";
 
 const Sellers = () => {
+  const { sellers, totalSeller } = useSelector((state) => state.seller);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [perPage, setPerPage] = useState(5);
@@ -61,66 +63,65 @@ const Sellers = () => {
               </tr>
             </thead>
             <tbody className="text-sm font-normal">
-              {[1, 2, 3, 4, 5].map((d, i) => (
+              {sellers?.map((d, i) => (
                 <tr key={i}>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    {d}
+                    {i + 1}.
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <img
-                      className="w-[45px] h-[45px]"
-                      src={`http://localhost:3000/images/category/${d}.jpg`}
-                      alt=""
-                    />
+                    <img className="w-[45px] h-[45px]" src={d.image} alt="" />
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>Sports</span>
+                    <span>{d.category}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>ABC Fashion</span>
+                    <span>{d.shopInfo.shopName}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>Pending</span>
+                    <span>{d.status}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>johndoe@gmail.com</span>
+                    <span>{d.email}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>Los Angeles</span>
+                    <span>{d.shopInfo.division}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>Cupertino</span>
+                    <span>{d.shopInfo.district}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
                     <div className="flex justify-start items-center gap-4">
-                      <Link to="/admin/dashboard/seller/details/1" className="p-[6px] bg-green-500 rounded-sm hover:shadow-lg hover:shadow-yellow-500/50">
+                      <Link
+                        to={`/admin/dashboard/seller/details/${d._id}`}
+                        className="p-[6px] bg-green-500 rounded-sm hover:shadow-lg hover:shadow-yellow-500/50"
+                      >
                         <FaEye />
                       </Link>
                     </div>
