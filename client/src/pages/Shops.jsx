@@ -9,11 +9,15 @@ import { FaThList } from "react-icons/fa";
 import { Range } from "react-range";
 import Footer from "../components/Footer";
 import Products from "../components/products/Products";
+import ShopProducts from "../components/products/ShopProducts";
+import Pagination from "../components/Pagination";
 
 const Shops = () => {
   const [styles, setStyles] = useState("grid");
   const [filter, setFilter] = useState(true);
   const [state, setState] = useState({ values: [50, 2000] });
+  const [pageNumber, setPageNumber] = useState(1);
+  const [perPage, setPerPage] = useState(3);
   const categories = [
     "Sports",
     "Toys",
@@ -234,20 +238,46 @@ const Shops = () => {
                     12 Products
                   </h2>
                   <div className="flex justify-center items-center gap-3">
-                    <select className="p-1 border outline-0 text-slate-600 font-semibold" name="" id="">
+                    <select
+                      className="p-1 border outline-0 text-slate-600 font-semibold"
+                      name=""
+                      id=""
+                    >
                       <option value="">Sort By</option>
                       <option value="">Low to High Price</option>
                       <option value="">SHigh to Low Price</option>
                     </select>
                     <div className="flex justify-center items-start gap-4 md-lg:hidden">
-                      <div onClick={() => setStyles("grid")} className={`p-2 ${styles === "grid" && "bg-slate-300"} text-slate-600 hover:bg-slate-300 cursor-pointer rounded-sm`}>
+                      <div
+                        onClick={() => setStyles("grid")}
+                        className={`p-2 ${
+                          styles === "grid" && "bg-slate-300"
+                        } text-slate-600 hover:bg-slate-300 cursor-pointer rounded-sm`}
+                      >
                         <BsFillGridFill />
                       </div>
-                      <div onClick={() => setStyles("list")} className={`p-2 ${styles === "list" && "bg-slate-300"} text-slate-600 hover:bg-slate-300 cursor-pointer rounded-sm`}>
+                      <div
+                        onClick={() => setStyles("list")}
+                        className={`p-2 ${
+                          styles === "list" && "bg-slate-300"
+                        } text-slate-600 hover:bg-slate-300 cursor-pointer rounded-sm`}
+                      >
                         <FaThList />
                       </div>
                     </div>
                   </div>
+                </div>
+                <div className="pb-8">
+                  <ShopProducts styles={styles} />
+                </div>
+                <div className="">
+                  <Pagination
+                    pageNumber={pageNumber}
+                    setPageNumber={setPageNumber}
+                    totalItem={20}
+                    perPage={perPage}
+                    showItem={Math.floor(20 / 3)}
+                  />
                 </div>
               </div>
             </div>
