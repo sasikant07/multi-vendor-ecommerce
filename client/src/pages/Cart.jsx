@@ -1,12 +1,24 @@
 import React from "react";
 import Headers from "../components/Headers";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Footer from "../components/Footer";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const cart_product = [1, 2, 3];
   const outOfStockProduct = [1, 2];
+
+  const redirect = () => {
+    navigate("/shipping", {
+      state: {
+        products: [],
+        price: 500,
+        shippingFee: 50,
+        items: 4,
+      },
+    });
+  };
 
   return (
     <div>
@@ -140,32 +152,41 @@ const Cart = () => {
                 </div>
               </div>
               <div className="w-[33%] md-lg:w-full">
-                            <div className="pl-3 md-lg:pl-0 md-lg:mt-5">
-                                {
-                                    cart_product.length > 0 && (
-                                        <div className="bg-white p-3 text-slate-600 flex flex-col gap-3">
-                                            <h2 className="text-xl font-bold">Order Summary</h2>
-                                            <div className="flex justify-between items-center">
-                                                <span>4 Items</span>
-                                                <span>$799</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span>Shipping Fee</span>
-                                                <span>$7</span>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <input className="w-full px-3 py-2 border border-slate-200 outline-0 focus:border-green-500 rounded-sm" type="text" placeholder="Add coupon" />
-                                                <button className="px-5 py-[1px] bg-blue-500 text-white  rounded-sm uppercase text-sm">Apply</button>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span>Total</span>
-                                                <span className="text-lg text-orange-500">$806</span>
-                                            </div>
-                                            <button className="px-5 py-[6px] rounded-sm hover:shadow-orange-500/20 hover:shadow-lg bg-orange-500 text-sm text-white uppercase">Proceed to checkout 4</button>
-                                        </div>
-                                    )
-                                }
-                            </div>
+                <div className="pl-3 md-lg:pl-0 md-lg:mt-5">
+                  {cart_product.length > 0 && (
+                    <div className="bg-white p-3 text-slate-600 flex flex-col gap-3">
+                      <h2 className="text-xl font-bold">Order Summary</h2>
+                      <div className="flex justify-between items-center">
+                        <span>4 Items</span>
+                        <span>$799</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Shipping Fee</span>
+                        <span>$7</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          className="w-full px-3 py-2 border border-slate-200 outline-0 focus:border-green-500 rounded-sm"
+                          type="text"
+                          placeholder="Add coupon"
+                        />
+                        <button className="px-5 py-[1px] bg-blue-500 text-white  rounded-sm uppercase text-sm">
+                          Apply
+                        </button>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Total</span>
+                        <span className="text-lg text-orange-500">$806</span>
+                      </div>
+                      <button
+                        onClick={redirect}
+                        className="px-5 py-[6px] rounded-sm hover:shadow-orange-500/20 hover:shadow-lg bg-orange-500 text-sm text-white uppercase"
+                      >
+                        Proceed to checkout 4
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
