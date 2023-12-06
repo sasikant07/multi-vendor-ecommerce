@@ -17,7 +17,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoIosCall } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
 
-const Headers = () => {
+const Headers = ({ categories }) => {
   const { pathname } = useLocation();
   const [showSidebar, setShowSidebar] = useState(false);
   const [categoryShow, setCategoryShow] = useState(true);
@@ -25,18 +25,7 @@ const Headers = () => {
   const [category, setSetCategory] = useState("");
   const user = true;
   const wishlist = 4;
-  const categories = [
-    "Sports",
-    "Toys",
-    "Clothings",
-    "Shoes",
-    "Furnitures",
-    "Accessories",
-    "Electronics",
-    "Beauty & Personal care",
-    "Fitness",
-    "Books",
-  ];
+
   return (
     <div className="w-full bg-white">
       <div className="header-top bg-[#eeeeee] md-lg:hidden">
@@ -359,14 +348,19 @@ const Headers = () => {
                   categoryShow ? "h-0" : "h-[400px]"
                 } overflow-hidden transition-all md-lg:relative duration-500 absolute z-[99999] bg-white w-full border-x`}
               >
-                <ul className="py-2 text-slate-600 font-medium">
-                  {categories.map((c, i) => {
+                <ul className="py-2 text-slate-600 font-medium h-full overflow-auto">
+                  {categories?.map((c, i) => {
                     return (
                       <li
                         key={i}
                         className="flex justify-start items-center gap-2 px-[24px] py-[6px]"
                       >
-                        <Link className="text-sm block">{c}</Link>
+                        <img
+                          src={c.image}
+                          className="w-[30px] h-[30px] rounded-full overflow-hidden"
+                          alt={c.name}
+                        />
+                        <Link to={`/product/${c.slug}`} className="text-sm block">{c.name}</Link>
                       </li>
                     );
                   })}
@@ -385,9 +379,9 @@ const Headers = () => {
                       name=""
                       id=""
                     >
-                      <option value="">Select Catecory</option>
+                      <option value="">Select Category</option>
                       {categories.map((c, i) => (
-                        <option value={c}>{c}</option>
+                        <option value={c.name}>{c.name}</option>
                       ))}
                     </select>
                   </div>

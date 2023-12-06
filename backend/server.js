@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/dashboard/categoryRoutes");
 const productRoutes = require("./routes/dashboard/productRoutes");
 const sellerRoutes = require("./routes/dashboard/sellerRoutes");
+const homeRoutes = require("./routes/home/homeRoutes");
 const { dbConnect } = require("./utils/db");
 dotenv.config();
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api", authRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", productRoutes);
 app.use("/api", sellerRoutes);
+app.use("/api/home", homeRoutes);
 
 const port = process.env.PORT;
 dbConnect();
