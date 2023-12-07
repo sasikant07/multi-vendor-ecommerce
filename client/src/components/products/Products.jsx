@@ -4,12 +4,7 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-const Products = ({ title }) => {
-  const products = [
-    [1, 2, 3],
-    [4, 5, 6],
-  ];
-
+const Products = ({ title, products }) => {
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -66,17 +61,17 @@ const Products = ({ title }) => {
       >
         {products.map((p, i) => {
           return (
-            <div className="flex flex-col justify-start gap-2">
-              {p.map((pl, i) => (
-                <Link to="#" className="flex justify-start items-start">
+            <div className="flex flex-col justify-start gap-2" key={i}>
+              {p.map((pl, j) => (
+                <Link to="#" className="flex justify-start items-start" key={j}>
                   <img
                     className="w-[110px] h-[110px]"
-                    src={`http://localhost:3000/images/products/${pl}.webp`}
-                    alt="products"
+                    src={pl.images[0]}
+                    alt={pl.name}
                   />
                   <div className="px-3 flex justify-start items-start gap-1 flex-col text-slate-600">
-                    <h2>Mens' Casula T-Shirt Regular Fit</h2>
-                    <span className="text-lg font-bold">$799</span>
+                    <h2>{pl.name}</h2>
+                    <span className="text-lg font-bold">${pl.price}</span>
                   </div>
                 </Link>
               ))}

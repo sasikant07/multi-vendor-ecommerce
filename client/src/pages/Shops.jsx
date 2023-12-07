@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Headers from "../components/Headers";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { AiFillStar } from "react-icons/ai";
 import { CiStar } from "react-icons/ci";
@@ -11,25 +12,60 @@ import Footer from "../components/Footer";
 import Products from "../components/products/Products";
 import ShopProducts from "../components/products/ShopProducts";
 import Pagination from "../components/Pagination";
+import { price_range_product, query_products } from "../store/reducers/homeReducer";
 
 const Shops = () => {
+  const dispatch = useDispatch();
+  const { categories, latest_product, priceRange, products } = useSelector(
+    (state) => state.home
+  );
   const [styles, setStyles] = useState("grid");
   const [filter, setFilter] = useState(true);
-  const [state, setState] = useState({ values: [50, 2000] });
+  const [state, setState] = useState({ values: [1, 1000] });
   const [pageNumber, setPageNumber] = useState(1);
   const [perPage, setPerPage] = useState(3);
-  const categories = [
-    "Sports",
-    "Toys",
-    "Clothings",
-    "Shoes",
-    "Furnitures",
-    "Accessories",
-    "Electronics",
-    "Beauty & Personal care",
-    "Fitness",
-    "Books",
-  ];
+  const [category, setCategory] = useState("");
+  const [rating, setRatingQ] = useState("");
+  const [sortPrice, setSortPrice] = useState("");
+
+  useEffect(() => {
+    dispatch(price_range_product());
+  }, []);
+
+  useEffect(() => {
+    setState({
+      values: [priceRange.low, priceRange.high],
+    });
+  }, [priceRange]);
+
+  useEffect(() => {
+    dispatch(
+      query_products({
+        low: state.values[0],
+        high: state.values[1],
+        category,
+        rating,
+        sortPrice,
+        pageNumber,
+      })
+    );
+  }, [
+    state.values[0],
+    state.values[1],
+    category,
+    rating,
+    pageNumber,
+    sortPrice,
+  ]);
+
+  const queryCategory = (e, value) => {
+    if (e.target.checked) {
+      setCategory(value);
+    } else {
+      setCategory("");
+    }
+  };
+
   return (
     <div>
       <Headers />
@@ -76,12 +112,18 @@ const Shops = () => {
                     className="flex justify-start items-center gap-2 py-1"
                     key={i}
                   >
-                    <input type="checkbox" name="" id={c} />
+                    <input
+                      checked={category === c.name ? true : false}
+                      onChange={(e) => queryCategory(e, c.name)}
+                      type="checkbox"
+                      name=""
+                      id={c.name}
+                    />
                     <label
                       className="text-slate-600 block cursor-pointer"
-                      htmlFor={c}
+                      htmlFor={c.name}
                     >
-                      {c}
+                      {c.name}
                     </label>
                   </div>
                 ))}
@@ -92,8 +134,8 @@ const Shops = () => {
                 </h2>
                 <Range
                   step={5}
-                  min={50}
-                  max={2000}
+                  min={priceRange.low}
+                  max={priceRange.high}
                   values={state.values}
                   onChange={(values) => setState({ values })}
                   renderTrack={({ props, children }) => (
@@ -123,7 +165,10 @@ const Shops = () => {
                   Ratings
                 </h2>
                 <div className="flex flex-col gap-3">
-                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer">
+                  <div
+                    onClick={() => setRatingQ(5)}
+                    className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
+                  >
                     <span>
                       <AiFillStar />
                     </span>
@@ -140,7 +185,10 @@ const Shops = () => {
                       <AiFillStar />
                     </span>
                   </div>
-                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer">
+                  <div
+                    onClick={() => setRatingQ(4)}
+                    className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
+                  >
                     <span>
                       <AiFillStar />
                     </span>
@@ -157,7 +205,10 @@ const Shops = () => {
                       <CiStar />
                     </span>
                   </div>
-                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer">
+                  <div
+                    onClick={() => setRatingQ(3)}
+                    className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
+                  >
                     <span>
                       <AiFillStar />
                     </span>
@@ -174,7 +225,10 @@ const Shops = () => {
                       <CiStar />
                     </span>
                   </div>
-                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer">
+                  <div
+                    onClick={() => setRatingQ(2)}
+                    className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
+                  >
                     <span>
                       <AiFillStar />
                     </span>
@@ -191,7 +245,10 @@ const Shops = () => {
                       <CiStar />
                     </span>
                   </div>
-                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer">
+                  <div
+                    onClick={() => setRatingQ(1)}
+                    className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer"
+                  >
                     <span>
                       <AiFillStar />
                     </span>
@@ -228,7 +285,7 @@ const Shops = () => {
                 </div>
               </div>
               <div className="py-5 flex flex-col gap-4 md:hidden">
-                <Products title="Latest Products" />
+                <Products title="Latest Products" products={latest_product} />
               </div>
             </div>
             <div className="w-9/12 md-lg:w-8/12 md:w-full">
@@ -239,13 +296,14 @@ const Shops = () => {
                   </h2>
                   <div className="flex justify-center items-center gap-3">
                     <select
+                      onChange={(e) => setSortPrice(e.target.value)}
                       className="p-1 border outline-0 text-slate-600 font-semibold"
                       name=""
                       id=""
                     >
                       <option value="">Sort By</option>
-                      <option value="">Low to High Price</option>
-                      <option value="">SHigh to Low Price</option>
+                      <option value="low-to-high">Low to High Price</option>
+                      <option value="high-to-low">High to Low Price</option>
                     </select>
                     <div className="flex justify-center items-start gap-4 md-lg:hidden">
                       <div

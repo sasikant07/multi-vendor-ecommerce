@@ -16,9 +16,11 @@ import {
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoIosCall } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const Headers = ({ categories }) => {
+const Headers = () => {
   const { pathname } = useLocation();
+  const { categories } = useSelector((state) => state.home);
   const [showSidebar, setShowSidebar] = useState(false);
   const [categoryShow, setCategoryShow] = useState(true);
   const [searchValue, setSearchValue] = useState("");
@@ -360,7 +362,12 @@ const Headers = ({ categories }) => {
                           className="w-[30px] h-[30px] rounded-full overflow-hidden"
                           alt={c.name}
                         />
-                        <Link to={`/product/${c.slug}`} className="text-sm block">{c.name}</Link>
+                        <Link
+                          to={`/product/${c.slug}`}
+                          className="text-sm block"
+                        >
+                          {c.name}
+                        </Link>
                       </li>
                     );
                   })}
