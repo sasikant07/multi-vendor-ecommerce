@@ -4,6 +4,7 @@ import api from "../../api/api";
 const initialState = {
   categories: [],
   products: [],
+  totalProduct: 0,
   latest_product: [],
   topRated_product: [],
   discount_product: [],
@@ -85,6 +86,10 @@ const homeReducer = createSlice({
     builder.addCase(price_range_product.fulfilled, (state, action) => {
       state.latest_product = action.payload.latest_product;
       state.priceRange = action.payload.priceRange;
+    });
+    builder.addCase(query_products.fulfilled, (state, action) => {
+      state.products = action.payload.products;
+      state.totalProduct = action.payload.totalProduct;
     });
   },
 });

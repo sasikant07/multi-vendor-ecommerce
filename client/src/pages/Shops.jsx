@@ -16,7 +16,7 @@ import { price_range_product, query_products } from "../store/reducers/homeReduc
 
 const Shops = () => {
   const dispatch = useDispatch();
-  const { categories, latest_product, priceRange, products } = useSelector(
+  const { categories, latest_product, priceRange, products, totalProduct } = useSelector(
     (state) => state.home
   );
   const [styles, setStyles] = useState("grid");
@@ -326,7 +326,7 @@ const Shops = () => {
                   </div>
                 </div>
                 <div className="pb-8">
-                  <ShopProducts styles={styles} />
+                  <ShopProducts products={products} styles={styles} />
                 </div>
                 <div className="">
                   <Pagination

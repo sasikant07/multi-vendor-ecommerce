@@ -1,6 +1,7 @@
 const categoryModel = require("../../models/categoryModel");
 const productModel = require("../../models/productModel");
 const { responseReturn } = require("../../utils/response");
+const QueryProducts = require("../../utils/queryProducts");
 
 class HomeControllers {
   formatProduct = (products) => {
@@ -96,7 +97,28 @@ class HomeControllers {
   };
 
   query_products = async (req, res) => {
+    const perPage = 12; // 12 products per page
+    req.query.perPage = perPage;
     try {
+      const products = await productModel.find({}).sort({ createdAt: -1 });
+
+      const totalProduct = new QueryProducts(products, req.query)
+        .categoryQuery()
+        .priceQuery()
+        .ratingQuery()
+        .sortByPriceQuery()
+        .countProducts();
+
+      const result = new QueryProducts(products, req.query)
+        .categoryQuery()
+        .ratingQuery()
+        .priceQuery()
+        .sortByPriceQuery()
+        .skipQuery()
+        .limitQuery()
+        .getProducts();
+
+      responseReturn(res, 200, { products: result, totalProduct });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }
