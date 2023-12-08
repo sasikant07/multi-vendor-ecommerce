@@ -5,6 +5,7 @@ const initialState = {
   categories: [],
   products: [],
   totalProduct: 0,
+  perPage: 4,
   latest_product: [],
   topRated_product: [],
   discount_product: [],
@@ -58,7 +59,13 @@ export const query_products = createAsyncThunk(
   async (query, thunkAPI) => {
     try {
       const { data } = await api.get(
-        `/home/query-products?category=${query.category}&&rating=${query.rating}&&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${query.sortPrice}&&pageNumber=${query.pageNumber}`
+        `/home/query-products?category=${query.category}&&rating=${
+          query.rating
+        }&&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${
+          query.sortPrice
+        }&&pageNumber=${query.pageNumber}&&searchValue=${
+          query.searchValue ? query.searchValue : ""
+        }`
       );
       //   localStorage.setItem("accessToken", data.token);
       return thunkAPI.fulfillWithValue(data);
@@ -90,6 +97,7 @@ const homeReducer = createSlice({
     builder.addCase(query_products.fulfilled, (state, action) => {
       state.products = action.payload.products;
       state.totalProduct = action.payload.totalProduct;
+      state.perPage = action.payload.perPage;
     });
   },
 });

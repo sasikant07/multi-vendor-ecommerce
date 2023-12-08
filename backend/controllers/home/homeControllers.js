@@ -104,6 +104,7 @@ class HomeControllers {
 
       const totalProduct = new QueryProducts(products, req.query)
         .categoryQuery()
+        .searchQuery()
         .priceQuery()
         .ratingQuery()
         .sortByPriceQuery()
@@ -111,6 +112,7 @@ class HomeControllers {
 
       const result = new QueryProducts(products, req.query)
         .categoryQuery()
+        .searchQuery()
         .ratingQuery()
         .priceQuery()
         .sortByPriceQuery()
@@ -118,7 +120,7 @@ class HomeControllers {
         .limitQuery()
         .getProducts();
 
-      responseReturn(res, 200, { products: result, totalProduct });
+      responseReturn(res, 200, { products: result, totalProduct, perPage });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }

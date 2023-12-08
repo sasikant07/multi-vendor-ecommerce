@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Headers from "../components/Headers";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { AiFillStar } from "react-icons/ai";
@@ -17,25 +17,22 @@ import {
   query_products,
 } from "../store/reducers/homeReducer";
 
-const Shops = () => {
+const SearchProducts = () => {
   const dispatch = useDispatch();
-  const {
-    categories,
-    latest_product,
-    priceRange,
-    products,
-    totalProduct,
-    perPage,
-  } = useSelector((state) => state.home);
+  let [searchParams, setSearchParams] = useSearchParams();
+  const { latest_product, priceRange, products, totalProduct, perPage } =
+    useSelector((state) => state.home);
   const [styles, setStyles] = useState("grid");
   const [filter, setFilter] = useState(true);
   const [state, setState] = useState({
     values: [priceRange.low, priceRange.high],
   });
   const [pageNumber, setPageNumber] = useState(1);
-  const [category, setCategory] = useState("");
   const [rating, setRatingQ] = useState("");
   const [sortPrice, setSortPrice] = useState("");
+
+  const category = searchParams.get("category");
+  const searchValue = searchParams.get("value");
 
   useEffect(() => {
     dispatch(price_range_product());
@@ -50,12 +47,13 @@ const Shops = () => {
   useEffect(() => {
     dispatch(
       query_products({
-        low: state.values[0],
-        high: state.values[1],
+        low: state.values[0] || "",
+        high: state.values[1] || "",
         category,
         rating,
         sortPrice,
         pageNumber,
+        searchValue,
       })
     );
   }, [
@@ -65,15 +63,8 @@ const Shops = () => {
     rating,
     pageNumber,
     sortPrice,
+    searchValue
   ]);
-
-  const queryCategory = (e, value) => {
-    if (e.target.checked) {
-      setCategory(value);
-    } else {
-      setCategory("");
-    }
-  };
 
   const resetRating = () => {
     setRatingQ("");
@@ -126,31 +117,6 @@ const Shops = () => {
                   : "md:h-auto md:overflow-auto md:mb-0"
               }`}
             >
-              <h2 className="text-3xl font-bold mb-3 text-slate-600">
-                Category
-              </h2>
-              <div className="py-2">
-                {categories.map((c, i) => (
-                  <div
-                    className="flex justify-start items-center gap-2 py-1"
-                    key={i}
-                  >
-                    <input
-                      checked={category === c.name ? true : false}
-                      onChange={(e) => queryCategory(e, c.name)}
-                      type="checkbox"
-                      name=""
-                      id={c.name}
-                    />
-                    <label
-                      className="text-slate-600 block cursor-pointer"
-                      htmlFor={c.name}
-                    >
-                      {c.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
               <div className="py-2 flex flex-col gap-5">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
                   Price
@@ -375,4 +341,4 @@ const Shops = () => {
   );
 };
 
-export default Shops;
+export default SearchProducts;

@@ -15,11 +15,12 @@ import {
 } from "react-icons/ai";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { IoIosCall } from "react-icons/io";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const Headers = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { categories } = useSelector((state) => state.home);
   const [showSidebar, setShowSidebar] = useState(false);
   const [categoryShow, setCategoryShow] = useState(true);
@@ -27,6 +28,12 @@ const Headers = () => {
   const [category, setSetCategory] = useState("");
   const user = true;
   const wishlist = 4;
+
+  const search = () => {
+    navigate(
+      `/products/search?category=${category}&&value=${searchValue}`
+    );
+  };
 
   return (
     <div className="w-full bg-white">
@@ -363,7 +370,7 @@ const Headers = () => {
                           alt={c.name}
                         />
                         <Link
-                          to={`/product/${c.slug}`}
+                          to={`/products?category=${c.name}`}
                           className="text-sm block"
                         >
                           {c.name}
@@ -388,7 +395,9 @@ const Headers = () => {
                     >
                       <option value="">Select Category</option>
                       {categories.map((c, i) => (
-                        <option value={c.name}>{c.name}</option>
+                        <option key={i} value={c.name}>
+                          {c.name}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -400,7 +409,10 @@ const Headers = () => {
                     id=""
                     placeholder="What do you need"
                   />
-                  <button className="bg-violet-400 right-0 absolute px-8 h-full font-semibold uppercase text-white">
+                  <button
+                    onClick={search}
+                    className="bg-violet-400 right-0 absolute px-8 h-full font-semibold uppercase text-white"
+                  >
                     Search
                   </button>
                 </div>

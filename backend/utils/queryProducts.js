@@ -36,6 +36,18 @@ class QueryProducts {
     return this;
   };
 
+  searchQuery = () => {
+    this.products = this.query.searchValue
+      ? this.products.filter(
+          (p) =>
+            p.name.toUpperCase().indexOf(this.query.searchValue.toUpperCase()) >
+            -1
+        )
+      : this.products;
+
+    return this;
+  };
+
   sortByPriceQuery = () => {
     if (this.query.sortPrice) {
       if (this.query.sortPrice === "low-to-high") {
@@ -88,7 +100,7 @@ class QueryProducts {
 
   countProducts = () => {
     return this.products.length;
-  }
+  };
 }
 
 module.exports = QueryProducts;
