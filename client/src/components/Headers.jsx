@@ -22,17 +22,16 @@ const Headers = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { categories } = useSelector((state) => state.home);
+  const { userInfo } = useSelector((state) => state.auth);
   const [showSidebar, setShowSidebar] = useState(false);
   const [categoryShow, setCategoryShow] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [category, setSetCategory] = useState("");
-  const user = true;
+  const user = false;
   const wishlist = 4;
 
   const search = () => {
-    navigate(
-      `/products/search?category=${category}&&value=${searchValue}`
-    );
+    navigate(`/products/search?category=${category}&&value=${searchValue}`);
   };
 
   return (
@@ -75,7 +74,7 @@ const Headers = () => {
                     <li>Hindi</li>
                   </ul>
                 </div>
-                {user ? (
+                {userInfo ? (
                   <Link
                     to="/dashboard"
                     className="flex cursor-pointer justify-center items-center gap-2 text-sm"
@@ -83,15 +82,18 @@ const Headers = () => {
                     <span>
                       <FaUser />
                     </span>
-                    <span>John Doe</span>
+                    <span>{userInfo.name}</span>
                   </Link>
                 ) : (
-                  <div className="flex cursor-pointer justify-center items-center gap-2 text-sm">
+                  <Link
+                    to="/login"
+                    className="flex cursor-pointer justify-center items-center gap-2 text-sm"
+                  >
                     <span>
                       <FaLock />
                     </span>
                     <span>Login</span>
-                  </div>
+                  </Link>
                 )}
               </div>
             </div>
@@ -227,7 +229,7 @@ const Headers = () => {
                   <li>Hindi</li>
                 </ul>
               </div>
-              {user ? (
+              {userInfo ? (
                 <Link
                   to="/dashboard"
                   className="flex cursor-pointer justify-center items-center gap-2 text-sm"
@@ -235,7 +237,7 @@ const Headers = () => {
                   <span>
                     <FaUser />
                   </span>
-                  <span>John Doe</span>
+                  <span>{userInfo.name}</span>
                 </Link>
               ) : (
                 <div className="flex cursor-pointer justify-center items-center gap-2 text-sm">
