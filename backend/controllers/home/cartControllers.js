@@ -40,6 +40,7 @@ class CartController {
   };
 
   get_cart_products = async (req, res) => {
+    const co = 5; // Platform fees
     const { userId } = req.params;
     try {
       const cart_products = await cartModel.aggregate([
@@ -78,8 +79,61 @@ class CartController {
       for (let i = 0; i < stockProduct.length; i++) {
         const { quantity } = stockProduct[i];
         cart_product_count = cart_product_count + quantity;
-        const {price, discount} = stockProduct[i].products[0];
+        const { price, discount } = stockProduct[i].products[0];
+        if (discount !== 0) {
+          calculatePrice =
+            calculatePrice +
+            quantity * (price - Math.floor((price * discount) / 100));
+        } else {
+          calculatePrice = calculatePrice + quantity * price;
+        }
       }
+      let p = [];
+      let unique = [
+        ...new Set(stockProduct.map((p) => p.products[0].sellerId.toString())),
+      ];
+
+      // show product as per the different seller in cart page
+      for (let i = 0; i < unique.length; i++) {
+        let price = 0;
+        for (let j = 0; j < stockProduct.length; j++) {
+          const tempProduct = stockProduct[j].products[0];
+          if (unique[j] === tempProduct.sellerId.toString()) {
+            let pri = 0;
+            if (tempProduct.discount !== 0) {
+              pri =
+                tempProduct.price -
+                Math.floor((tempProduct.price * tempProduct.discount) / 100);
+            } else {
+              pri = tempProduct.price;
+            }
+            pri = pri - Math.floor((pri * co) / 100);
+            price = price + pri * stockProduct[j].quantity;
+            p[i] = {
+              sellerId: unique[i],
+              shopName: tempProduct.shopName,
+              price,
+              products: p[i]
+                ? [
+                    ...p[i].products,
+                    {
+                      _id: stockProduct[j]._id,
+                      quantity: stockProduct[j].quantity,
+                      productInfo: tempProduct,
+                    },
+                  ]
+                : [
+                    {
+                      _id: stockProduct[j]._id,
+                      quantity: stockProduct[j].quantity,
+                      productInfo: tempProduct,
+                    },
+                  ],
+            };
+          }
+        }
+      }
+      
     } catch (error) {}
   };
 }
