@@ -9,6 +9,7 @@ const productRoutes = require("./routes/dashboard/productRoutes");
 const sellerRoutes = require("./routes/dashboard/sellerRoutes");
 const homeRoutes = require("./routes/home/homeRoutes");
 const customerAuthRoutes = require("./routes/home/customerAuthRoutes");
+const cartRoutes = require("./routes/home/cartRoutes");
 const { dbConnect } = require("./utils/db");
 dotenv.config();
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api", productRoutes);
 app.use("/api", sellerRoutes);
 app.use("/api/home", homeRoutes);
 app.use("/api", customerAuthRoutes);
+app.use("/api", cartRoutes);
 
 const port = process.env.PORT;
 dbConnect();

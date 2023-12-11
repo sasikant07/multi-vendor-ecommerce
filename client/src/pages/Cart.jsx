@@ -1,11 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Headers from "../components/Headers";
 import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Footer from "../components/Footer";
+import { useDispatch, useSelector } from "react-redux";
+import { get_cart_products } from "../store/reducers/cartReducer";
 
 const Cart = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+  const { cart_products } = useSelector((state) => state.cart);
   const cart_product = [1, 2, 3];
   const outOfStockProduct = [1, 2];
 
@@ -19,6 +24,10 @@ const Cart = () => {
       },
     });
   };
+
+  useEffect(() => {
+    dispatch(get_cart_products(userInfo.id));
+  }, []);
 
   return (
     <div>
