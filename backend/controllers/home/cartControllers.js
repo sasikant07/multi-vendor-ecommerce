@@ -62,6 +62,7 @@ class CartController {
         },
       ]);
 
+      let buy_product_item = 0;
       let calculatePrice = 0;
       let cart_product_count = 0;
       const outOfStockProduct = cart_products.filter(
@@ -79,6 +80,7 @@ class CartController {
       for (let i = 0; i < stockProduct.length; i++) {
         const { quantity } = stockProduct[i];
         cart_product_count = cart_product_count + quantity;
+        buy_product_item = buy_product_item + quantity;
         const { price, discount } = stockProduct[i].products[0];
         if (discount !== 0) {
           calculatePrice =
@@ -98,7 +100,7 @@ class CartController {
         let price = 0;
         for (let j = 0; j < stockProduct.length; j++) {
           const tempProduct = stockProduct[j].products[0];
-          if (unique[j] === tempProduct.sellerId.toString()) {
+          if (unique[i] === tempProduct.sellerId.toString()) {
             let pri = 0;
             if (tempProduct.discount !== 0) {
               pri =
@@ -133,8 +135,47 @@ class CartController {
           }
         }
       }
-      
-    } catch (error) {}
+
+      responseReturn(res, 200, {
+        cart_products: p,
+        price: calculatePrice,
+        cart_product_count,
+        shippingFee: 55 * p.length,
+        outOfStockProduct,
+        buy_product_item,
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  delete_cart_product = async (req, res) => {
+    const { cart_id } = req.params;
+
+    try {
+      await cartModel.findByIdAndDelete(cart_id);
+
+      responseReturn(res, 200, { message: "Product deleted from cart" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  quantity_inc = async (req, res) => {
+    const { cart_id } = req.params;
+
+    try {
+      const product = await cartModel.findById(cart_id);
+      const { quantity } = product;
+
+      await cartModel.findByIdAndUpdate(cart_id, {
+        quantity: quantity + 1,
+      });
+
+      responseReturn(res, 200, { message: "Product quantity increased" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
   };
 }
 

@@ -11,7 +11,7 @@ const FeatureProducts = ({ products }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const { errorMessage, successMessage, cart_products_count } = useSelector(
+  const { errorMessage, successMessage } = useSelector(
     (state) => state.cart
   );
 

@@ -22,14 +22,14 @@ const Headers = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { categories } = useSelector((state) => state.home);
-  const { cart_products_count } = useSelector((state) => state.cart);
+  const { cart_product_count } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
   const [showSidebar, setShowSidebar] = useState(false);
   const [categoryShow, setCategoryShow] = useState(true);
   const [searchValue, setSearchValue] = useState("");
   const [category, setSetCategory] = useState("");
   const user = false;
-  const wishlist = 4;
+  const wishlist = 34;
 
   const search = () => {
     navigate(`/products/search?category=${category}&&value=${searchValue}`);
@@ -203,9 +203,9 @@ const Headers = () => {
                       <span className="text-xl text-orange-500 ">
                         <AiFillShopping />
                       </span>
-                      {cart_products_count !== 0 && (
-                        <div className="w-[20px] h-[20px] absolute bg-green-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
-                          {cart_products_count}
+                      {cart_product_count !== 0 && (
+                        <div className="w-[20px] h-[20px] absolute bg-green-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] text-[12px]">
+                          {cart_product_count}
                         </div>
                       )}
                     </div>
