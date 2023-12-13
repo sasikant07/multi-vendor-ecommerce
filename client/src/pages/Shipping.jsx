@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Headers from "../components/Headers";
 import Footer from "../components/Footer";
+import { useDispatch, useSelector } from "react-redux";
+import { place_order } from "../store/reducers/orderReducer";
 
 const initialState = {
   name: "",
@@ -15,7 +17,12 @@ const initialState = {
 };
 
 const Shipping = () => {
-  //   const { state } = useLocation();
+  const {
+    state: { products, price, shippingFee, items },
+  } = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { userInfo } = useSelector((state) => state.auth);
   const [state, setState] = useState(initialState);
   const [res, setRes] = useState(false);
 
@@ -32,6 +39,20 @@ const Shipping = () => {
     if (name && address && phone && post && province && city && area) {
       setRes(true);
     }
+  };
+
+  const placeOrder = () => {
+    dispatch(
+      place_order({
+        price,
+        products,
+        shipping_fee: shippingFee,
+        shippingInfo: state,
+        userId: userInfo.id,
+        navigate,
+        items,
+      })
+    );
   };
 
   return (
@@ -201,33 +222,43 @@ const Shipping = () => {
                     </>
                   )}
                 </div>
-                {[1, 2].map((p, i) => (
-                  <div className="flex bg-white p-4 flex-col gap-2">
+                {products.map((p, i) => (
+                  <div className="flex bg-white p-4 flex-col gap-2" key={i}>
                     <div className="flex justify-start items-center">
-                      <h2 className="text-md text-slate-600">ABC Fashion</h2>
+                      <h2 className="text-md text-slate-600">{p.shopName}</h2>
                     </div>
-                    {[1, 2].map((p, i) => (
-                      <div className="w-full flex flex-wrap">
+                    {p.products.map((pt, j) => (
+                      <div className="w-full flex flex-wrap" key={j + 99}>
                         <div className="flex sm:w-full gap-2 w-7/12">
                           <div className="flex gap-2 justify-start items-center">
                             <img
                               className="w-[80px] h-[80px]"
-                              src={`http://localhost:3000/images/products/${p}.webp`}
+                              src={pt.productInfo.images[0]}
                               alt="product"
                             />
                             <div className="pr-4 text-slate-600">
-                              <h2 className="text-md">
-                                Mens casual T-Shirt Regular Fit
-                              </h2>
-                              <span className="text-sm">Brand: Nike</span>
+                              <h2 className="text-md">{pt.productInfo.name}</h2>
+                              <span className="text-sm">
+                                Brand: {pt.productInfo.brand}
+                              </span>
                             </div>
                           </div>
                         </div>
                         <div className="flex justify-end w-5/12 sm:w-full sm:mt-3">
                           <div className="pl-4 sm:pl-0">
-                            <h2 className="text-lg text-orange-500">$799</h2>
-                            <p className="line-through">$579</p>
-                            <p>-10%</p>
+                            <h2 className="text-lg text-orange-500">
+                              $
+                              {pt.productInfo.price -
+                                Math.floor(
+                                  (pt.productInfo.price *
+                                    pt.productInfo.discount) /
+                                    100
+                                )}
+                            </h2>
+                            <p className="line-through">
+                              ${pt.productInfo.price}
+                            </p>
+                            <p>-{pt.productInfo.discount}%</p>
                           </div>
                         </div>
                       </div>
@@ -242,21 +273,22 @@ const Shipping = () => {
                   <h2 className="text-xl font-semibold">Order Summary</h2>
                   <div className="flex justify-between items-center">
                     <span>Items Total</span>
-                    <span className="">$806</span>
+                    <span className="">${price}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Delivery Charges</span>
-                    <span className="">$80</span>
+                    <span className="">${shippingFee}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Total Payment</span>
-                    <span className="">$976</span>
+                    <span className="">${price + shippingFee}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Total</span>
-                    <span className="">$976</span>
+                    <span className="">${price + shippingFee}</span>
                   </div>
                   <button
+                    onClick={placeOrder}
                     disabled={res ? false : true}
                     className={`px-5 py-[6px] rounded-sm hover:shadow-orange-500/20 hover:shadow-lg ${
                       res ? "bg-orange-500" : "bg-orange-300"

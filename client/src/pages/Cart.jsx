@@ -10,6 +10,7 @@ import {
   delete_cart_product,
   messageClear,
   quantity_inc,
+  quantity_dec,
 } from "../store/reducers/cartReducer";
 
 const Cart = () => {
@@ -30,10 +31,10 @@ const Cart = () => {
   const redirect = () => {
     navigate("/shipping", {
       state: {
-        products: [],
-        price: 500,
+        products: cart_products,
+        price: price,
         shippingFee: shipping_fee,
-        items: 4,
+        items: buy_product_item,
       },
     });
   };
@@ -43,6 +44,14 @@ const Cart = () => {
 
     if (temp <= stock) {
       dispatch(quantity_inc(cart_id));
+    }
+  };
+
+  const dec = (quantity, cart_id) => {
+    const temp = quantity - 1;
+
+    if (temp !== 0) {
+      dispatch(quantity_dec(cart_id));
     }
   };
 
@@ -138,7 +147,12 @@ const Cart = () => {
                               </div>
                               <div className="flex gap-2 flex-col">
                                 <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
-                                  <div className="px-3 cursor-pointer">-</div>
+                                  <div
+                                    onClick={() => dec(pt.quantity, pt._id)}
+                                    className="px-3 cursor-pointer"
+                                  >
+                                    -
+                                  </div>
                                   <div className="px-3">{pt.quantity}</div>
                                   <div
                                     onClick={() =>
@@ -177,7 +191,7 @@ const Cart = () => {
                         </div>
                         <div className="bg-white p-4">
                           {out_of_stock_products.map((p, i) => (
-                            <div className="w-full flex flex-wrap">
+                            <div className="w-full flex flex-wrap" key={i}>
                               <div className="flex sm:w-full gap-2 w-7/12">
                                 <div className="flex gap-2 justify-start items-center">
                                   <img
@@ -213,9 +227,25 @@ const Cart = () => {
                                 </div>
                                 <div className="flex gap-2 flex-col">
                                   <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
-                                    <div className="px-3 cursor-pointer">-</div>
+                                    <div
+                                      onClick={() => dec(p.quantity, p._id)}
+                                      className="px-3 cursor-pointer"
+                                    >
+                                      -
+                                    </div>
                                     <div className="px-3">{p.quantity}</div>
-                                    <div className="px-3 cursor-pointer">+</div>
+                                    <div
+                                      onClick={() =>
+                                        inc(
+                                          p.quantity,
+                                          p.products[0].stock,
+                                          p._id
+                                        )
+                                      }
+                                      className="px-3 cursor-pointer"
+                                    >
+                                      +
+                                    </div>
                                   </div>
                                   <button
                                     onClick={() =>

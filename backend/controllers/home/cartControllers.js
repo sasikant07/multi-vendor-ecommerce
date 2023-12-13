@@ -177,6 +177,23 @@ class CartController {
       responseReturn(res, 500, { error: error.message });
     }
   };
+
+  quantity_dec = async (req, res) => {
+    const { cart_id } = req.params;
+
+    try {
+      const product = await cartModel.findById(cart_id);
+      const { quantity } = product;
+
+      await cartModel.findByIdAndUpdate(cart_id, {
+        quantity: quantity - 1,
+      });
+
+      responseReturn(res, 200, { message: "Product quantity decreased" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
 }
 
 module.exports = new CartController();

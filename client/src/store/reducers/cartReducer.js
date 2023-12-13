@@ -66,6 +66,18 @@ export const quantity_inc = createAsyncThunk(
   }
 );
 
+export const quantity_dec = createAsyncThunk(
+  "cart/quantity-dec",
+  async (cartId, thunkAPI) => {
+    try {
+      const { data } = await api.put(`/home/product/quantity-dec/${cartId}`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const cartReducer = createSlice({
   name: "cart",
   initialState,
@@ -101,6 +113,12 @@ const cartReducer = createSlice({
       state.successMessage = action.payload.message;
     });
     builder.addCase(quantity_inc.rejected, (state, action) => {
+      state.errorMessage = action.payload.error;
+    });
+    builder.addCase(quantity_dec.fulfilled, (state, action) => {
+      state.successMessage = action.payload.message;
+    });
+    builder.addCase(quantity_dec.rejected, (state, action) => {
       state.errorMessage = action.payload.error;
     });
   },
