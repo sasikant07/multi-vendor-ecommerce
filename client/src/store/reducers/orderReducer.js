@@ -11,8 +11,7 @@ const initialState = {
 export const place_order = createAsyncThunk(
   "order/place-order",
   async (
-    { price, products, shipping_fee, shippingInfo, userId, navigate, items },
-    thunkAPI
+    { price, products, shipping_fee, shippingInfo, userId, navigate, items }
   ) => {
     try {
       const { data } = await api.post(`/home/order/place-order`, {
@@ -24,9 +23,16 @@ export const place_order = createAsyncThunk(
         navigate,
         items,
       });
-      return thunkAPI.fulfillWithValue(data);
+      navigate("/payment", {
+        state: {
+          price: price + shipping_fee,
+          items,
+          orderId: data.orderId,
+        }
+      })
+      return true;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return error.response;
     }
   }
 );
