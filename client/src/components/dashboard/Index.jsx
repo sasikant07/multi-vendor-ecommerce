@@ -1,8 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { get_dashboard_index_data } from "../../store/reducers/dashboardReducer";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
+  const { totalOrder, recentOrders, pendingOrder, cancelledOrder } =
+    useSelector((state) => state.dashboard);
+
+  useEffect(() => {
+    dispatch(get_dashboard_index_data(userInfo.id));
+  }, []);
+
+  const redirect = (ord) => {
+    let items = 0;
+    for (let i = 0; i < ord.length; i++) {
+      items = ord.products[i].quantity + items;
+    }
+
+    navigate("/payment", {
+      state: {
+        price: ord.price,
+        items,
+        orderId: ord._id,
+      },
+    });
+  };
+
   return (
     <div>
       <div className="grid grid-cols-3 md:grid-cols-1 gap-5">
@@ -13,7 +40,7 @@ const Index = () => {
             </span>
           </div>
           <div className="flex flex-col justify-start items-start text-slate-600">
-            <h2 className="text-3xl font-bold">20</h2>
+            <h2 className="text-3xl font-bold">{totalOrder}</h2>
             <span>Orders</span>
           </div>
         </div>
@@ -24,7 +51,7 @@ const Index = () => {
             </span>
           </div>
           <div className="flex flex-col justify-start items-start text-slate-600">
-            <h2 className="text-3xl font-bold">10</h2>
+            <h2 className="text-3xl font-bold">{pendingOrder}</h2>
             <span>Pending Orders</span>
           </div>
         </div>
@@ -35,7 +62,7 @@ const Index = () => {
             </span>
           </div>
           <div className="flex flex-col justify-start items-start text-slate-600">
-            <h2 className="text-3xl font-bold">5</h2>
+            <h2 className="text-3xl font-bold">{cancelledOrder}</h2>
             <span>Cancelled Orders</span>
           </div>
         </div>
@@ -65,108 +92,47 @@ const Index = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white border-b">
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    835451945931549135
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    $2499
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-                  <td scope="row" className="px-6 py-4">
-                    <Link to={`/dashboard/order/details/1`}>
-                      <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded">
-                        View
+                {recentOrders.map((o, i) => (
+                  <tr className="bg-white border-b" key={i}>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      {o._id}
+                    </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      ${o.price}
+                    </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      {o.payment_status}
+                    </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      {o.delivery_status}
+                    </td>
+                    <td scope="row" className="px-6 py-4">
+                      <Link to={`/dashboard/order/details/${o._id}`}>
+                        <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded">
+                          View
+                        </span>
+                      </Link>
+                      <span
+                        onClick={() => redirect(o)}
+                        className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded cursor-pointer"
+                      >
+                        Pay Now
                       </span>
-                    </Link>
-                    <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded cursor-pointer">Pay Now</span>
-                  </td>
-                </tr>
-                <tr className="bg-white border-b">
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    835451945931549135
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    $2499
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-                  <td scope="row" className="px-6 py-4">
-                    <Link to={`/dashboard/order/details/1`}>
-                      <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded">
-                        View
-                      </span>
-                    </Link>
-                    <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded cursor-pointer">Pay Now</span>
-                  </td>
-                </tr>
-                <tr className="bg-white border-b">
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    835451945931549135
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    $2499
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-                  <td scope="row" className="px-6 py-4">
-                    <Link to={`/dashboard/order/details/1`}>
-                      <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded">
-                        View
-                      </span>
-                    </Link>
-                    <span className="bg-green-100 text-green-800 text-sm font-normal mr-2 px-2.5 py-[1px] rounded cursor-pointer">Pay Now</span>
-                  </td>
-                </tr>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

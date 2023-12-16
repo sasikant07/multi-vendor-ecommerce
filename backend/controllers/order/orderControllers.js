@@ -1,4 +1,7 @@
 const moment = require("moment");
+const {
+  mongo: { ObjectId },
+} = require("mongoose");
 const { responseReturn } = require("../../utils/response");
 const customerOrderModel = require("../../models/customerModel");
 const authOrderModel = require("../../models/authOrderModel");
@@ -11,19 +14,22 @@ class OrderController {
       if (order.payment_status === "Unpaid") {
         await customerOrderModel.findByIdAndUpdate(id, {
           delivery_status: "Cancelled",
-        })
-        await authOrderModel.updateMany({
-          orderId: id,
-        }, {
-          delivery_status: "Cancelled",
-        })
+        });
+        await authOrderModel.updateMany(
+          {
+            orderId: id,
+          },
+          {
+            delivery_status: "Cancelled",
+          }
+        );
       }
 
       return true;
     } catch (error) {
       console.log(error.message);
     }
-  }
+  };
 
   place_order = async (req, res) => {
     const { price, products, shipping_fee, shippingInfo, userId } = req.body;
@@ -82,15 +88,58 @@ class OrderController {
       await authOrderModel.insertMany(authorOrderData);
 
       // To remove products after placed order successfully
-      for(let k = 0; k < cartId.length; k++) {
+      for (let k = 0; k < cartId.length; k++) {
         await cartModel.findByIdAndDelete(cartId[k]);
       }
 
       setTimeout(() => {
-        this.paymentCheck(order.id)
-      }, 15000)
+        this.paymentCheck(order.id);
+      }, 15000);
 
-      responseReturn(res, 201, { message: "Order placed successfully", orderId: order.id });
+      responseReturn(res, 201, {
+        message: "Order placed successfully",
+        orderId: order.id,
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_customer_dashboard_data = async (req, res) => {
+    const { userId } = req.params;
+    try {
+      const recentOrders = await customerOrderModel
+        .find({
+          customerId: new ObjectId(userId),
+        })
+        .limit(5);
+
+      const totalOrder = await customerOrderModel
+        .find({
+          customerId: new ObjectId(userId),
+        })
+        .countDocuments();
+
+      const pendingOrder = await customerOrderModel
+        .find({
+          customerId: new ObjectId(userId),
+          delivery_status: "Pending",
+        })
+        .countDocuments();
+
+      const cancelledOrder = await customerOrderModel
+        .find({
+          customerId: new ObjectId(userId),
+          delivery_status: "Cancelled",
+        })
+        .countDocuments();
+
+      responseReturn(res, 200, {
+        recentOrders,
+        pendingOrder,
+        cancelledOrder,
+        totalOrder,
+      });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }
