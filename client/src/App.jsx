@@ -18,6 +18,7 @@ import Index from "./components/dashboard/Index";
 import Orders from "./components/dashboard/Orders";
 import Wishlist from "./components/dashboard/Wishlist";
 import ChangePassword from "./components/dashboard/ChangePassword";
+import Order from "./components/dashboard/Order";
 
 function App() {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ function App() {
             <Route path="my-orders" element={<Orders />} />
             <Route path="my-wishlist" element={<Wishlist />} />
             <Route path="change-password" element={<ChangePassword />} />
+            <Route path="order/details/:orderId" element={<Order />} />
           </Route>
         </Route>
       </Routes>

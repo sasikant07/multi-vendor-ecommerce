@@ -10,9 +10,15 @@ const initialState = {
 
 export const place_order = createAsyncThunk(
   "order/place-order",
-  async (
-    { price, products, shipping_fee, shippingInfo, userId, navigate, items }
-  ) => {
+  async ({
+    price,
+    products,
+    shipping_fee,
+    shippingInfo,
+    userId,
+    navigate,
+    items,
+  }) => {
     try {
       const { data } = await api.post(`/home/order/place-order`, {
         price,
@@ -28,11 +34,37 @@ export const place_order = createAsyncThunk(
           price: price + shipping_fee,
           items,
           orderId: data.orderId,
-        }
-      })
+        },
+      });
       return true;
     } catch (error) {
       return error.response;
+    }
+  }
+);
+
+export const get_orders = createAsyncThunk(
+  "order/get-orders",
+  async ({ customerId, status }, thunkAPI) => {
+    try {
+      const { data } = await api.get(
+        `/home/customer/get-orders/${customerId}/${status}`
+      );
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const get_order = createAsyncThunk(
+  "order/get-order",
+  async (orderId, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/home/customer/get-order/${orderId}`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
@@ -47,9 +79,12 @@ const orderReducer = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // builder.addCase(add_to_cart.rejected, (state, action) => {
-    //   state.errorMessage = action.payload.error;
-    // });
+    builder.addCase(get_orders.fulfilled, (state, action) => {
+      state.myOrders = action.payload.orders;
+    });
+    builder.addCase(get_order.fulfilled, (state, action) => {
+      state.myOrder = action.payload.order;
+    });
   },
 });
 
