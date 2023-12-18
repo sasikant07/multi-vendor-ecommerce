@@ -66,7 +66,7 @@ const Order = () => {
       <div className="mt-3">
         <h2 className="text-slate-600 text-lg pb-2">Products</h2>
         <div className="flex gap-5 flex-col">
-          {myOrder.products.map((p, i) => (
+          {myOrder.products?.map((p, i) => (
             <div className="" key={i}>
               <div className="flex gap-5 justify-start items-center text-slate-600">
                 <div className="flex gap-2">

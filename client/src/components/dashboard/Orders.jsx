@@ -14,7 +14,7 @@ const Orders = () => {
     dispatch(
       get_orders({
         status: state,
-        customerId: userInfo._id,
+        customerId: userInfo.id,
       })
     );
   }, [state]);
