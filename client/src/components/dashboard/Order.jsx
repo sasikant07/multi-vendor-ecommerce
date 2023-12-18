@@ -38,7 +38,7 @@ const Order = () => {
         <div className="text-slate-600">
           <h2>Price: ${myOrder.price} (including shipping fees.)</h2>
           <p>
-            Payment Status;{" "}
+            Payment Status:{" "}
             <span
               className={`py-[1px] text-xs px-3 ${
                 myOrder.payment_status === "paid"
@@ -50,7 +50,7 @@ const Order = () => {
             </span>
           </p>
           <p>
-            Order Status;{" "}
+            Order Status:{" "}
             <span
               className={`py-[1px] text-xs px-3 ${
                 myOrder.delivery_status === "paid"

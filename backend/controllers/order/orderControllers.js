@@ -3,7 +3,7 @@ const {
   mongo: { ObjectId },
 } = require("mongoose");
 const { responseReturn } = require("../../utils/response");
-const customerOrderModel = require("../../models/customerModel");
+const customerOrderModel = require("../../models/customerOrderModel");
 const authOrderModel = require("../../models/authOrderModel");
 const cartModel = require("../../models/cartModel");
 

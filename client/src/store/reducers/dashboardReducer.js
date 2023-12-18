@@ -14,7 +14,7 @@ export const get_dashboard_index_data = createAsyncThunk(
   "dashboard/get-dashboard-index-data",
   async (userId, thunkAPI) => {
     try {
-      const { data } = await api.get(`/customer/get-dashboard-data/${userId}`);
+      const { data } = await api.get(`/home/customer/get-dashboard-data/${userId}`);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -30,14 +30,14 @@ const dashboardReducer = createSlice({
       state.errorMessage = "";
       state.successMessage = "";
     },
-    extraReducers: (builder) => {
-      builder.addCase(get_dashboard_index_data.fulfilled, (state, action) => {
-        state.totalOrder = action.payload.totalOrder;
-        state.pendingOrder = action.payload.pendingOrder;
-        state.cancelledOrder = action.payload.cancelledOrder;
-        state.recentOrders = action.payload.recentOrders;
-      });
-    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(get_dashboard_index_data.fulfilled, (state, action) => {
+      state.totalOrder = action.payload.totalOrder;
+      state.pendingOrder = action.payload.pendingOrder;
+      state.cancelledOrder = action.payload.cancelledOrder;
+      state.recentOrders = action.payload.recentOrders;
+    });
   },
 });
 
