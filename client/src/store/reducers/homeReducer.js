@@ -13,6 +13,9 @@ const initialState = {
     low: 0,
     high: 10000,
   },
+  product: {},
+  relatedProducts: [],
+  moreProducts: [],
 };
 
 export const get_category = createAsyncThunk(
@@ -20,7 +23,6 @@ export const get_category = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await api.get("/home/get-categories");
-      //   localStorage.setItem("accessToken", data.token);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -33,7 +35,6 @@ export const get_products = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await api.get("/home/get-products");
-      //   localStorage.setItem("accessToken", data.token);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -46,7 +47,6 @@ export const price_range_product = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await api.get("/home/price-range-latest-product");
-      //   localStorage.setItem("accessToken", data.token);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -67,7 +67,18 @@ export const query_products = createAsyncThunk(
           query.searchValue ? query.searchValue : ""
         }`
       );
-      //   localStorage.setItem("accessToken", data.token);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const get_product = createAsyncThunk(
+  "product/get-product",
+  async (slug, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/home/get-product/${slug}`);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -98,6 +109,11 @@ const homeReducer = createSlice({
       state.products = action.payload.products;
       state.totalProduct = action.payload.totalProduct;
       state.perPage = action.payload.perPage;
+    });
+    builder.addCase(get_product.fulfilled, (state, action) => {
+      state.product = action.payload.product;
+      state.relatedProducts = action.payload.relatedProducts;
+      state.moreProducts = action.payload.moreProducts;
     });
   },
 });

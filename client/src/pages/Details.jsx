@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Headers from "../components/Headers";
 import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
@@ -13,8 +13,15 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination } from "swiper/modules";
 import Reviews from "../components/Reviews";
+import { useDispatch, useSelector } from "react-redux";
+import { get_product } from "../store/reducers/homeReducer";
 
 const Details = () => {
+  const { slug } = useParams();
+  const dispatch = useDispatch();
+  const { product, relatedProducts, moreProducts } = useSelector(
+    (state) => state.home
+  );
   const [image, setImage] = useState("");
   const [state, setState] = useState("reviews");
 
@@ -49,9 +56,12 @@ const Details = () => {
     },
   };
 
-  const images = [1, 2, 3, 4, 5, 6, 7];
   const discount = 15;
   const stock = 47;
+
+  useEffect(() => {
+    dispatch(get_product(slug));
+  }, [slug]);
   return (
     <div>
       <Headers />
@@ -71,11 +81,11 @@ const Details = () => {
             <span className="pt-1">
               <MdOutlineKeyboardArrowRight />
             </span>
-            <Link to="/">Sports</Link>
+            <Link to="/">{product?.category}</Link>
             <span className="pt-1">
               <MdOutlineKeyboardArrowRight />
             </span>
-            <span>Men's Casual T-shirt Regular Fit</span>
+            <span>{product.name}</span>
           </div>
         </div>
       </div>
@@ -86,27 +96,24 @@ const Details = () => {
               <div className="p-5 border">
                 <img
                   className="h-[500px] w-full"
-                  src={
-                    image
-                      ? `http://localhost:3000/images/products/${image}.webp`
-                      : `http://localhost:3000/images/products/${images[1]}.webp`
-                  }
+                  src={image ? image : product.images?.[0]}
                   alt="product"
                 />
               </div>
               <div className="py-3">
-                {images && (
+                {product.images && (
                   <Carousel
                     autoPlay={true}
                     infinite={true}
                     responsive={responsive}
                     transitionDuration={500}
                   >
-                    {images.map((img, i) => {
+                    {product.images.map((img, i) => {
                       return (
-                        <div onClick={() => setImage(img)}>
+                        <div key={i} onClick={() => setImage(img)}>
                           <img
-                            src={`http://localhost:3000/images/products/${img}.webp`}
+                            className="h-[120px] cursor-pointer border"
+                            src={img}
                             alt=""
                           />
                         </div>
@@ -118,35 +125,33 @@ const Details = () => {
             </div>
             <div className="flex flex-col gap-5">
               <div className="text-3xl text-slate-600 font-bold">
-                <h2>Men's Casual T-shirt Regular Fit</h2>
+                <h2>{product.name}</h2>
               </div>
               <div className="flex justify-start items-center gap-4">
                 <div className="flex text-xl">
-                  <Ratings ratings={4.5} />
+                  <Ratings ratings={product.rating} />
                 </div>
                 <span className="text-green-500">(23 reviews)</span>
               </div>
               <div className="text-2xl text-red-500 font-bold flex gap-3">
                 {discount ? (
                   <>
-                    <h2 className="line-through">$999</h2>
+                    <h2 className="line-through">${product.price}</h2>
                     <h2 className="text-green-700">
-                      ${999 - Math.floor((500 * discount) / 100)}
+                      $
+                      {product.price -
+                        Math.floor((product.price * product.discount) / 100)}
                     </h2>
-                    <h2 className="text-orange-500">-{discount}% Off</h2>
+                    <h2 className="text-orange-500">
+                      -{product.discount}% Off
+                    </h2>
                   </>
                 ) : (
-                  <h2>Price: $999</h2>
+                  <h2>Price: ${product.price}</h2>
                 )}
               </div>
               <div className="text-slate-600">
-                <p>
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text ever since the 1500s, when an unknown
-                  printer took a galley of type and scrambled it to make a type
-                  specimen book.
-                </p>
+                <p>{product.description}</p>
               </div>
               <div className="flex gap-3 pb-10 border-b">
                 {stock ? (
@@ -217,7 +222,7 @@ const Details = () => {
                 </div>
               </div>
               <div className="flex gap-3">
-                {stock ? (
+                {product.stock ? (
                   <button className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-emerald-500/40 bg-emerald-500 text-white">
                     Buy Now
                   </button>
