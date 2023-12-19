@@ -1,5 +1,7 @@
+const moment = require("moment");
 const categoryModel = require("../../models/categoryModel");
 const productModel = require("../../models/productModel");
+const reviewModel = require("../../models/reviewModel");
 const { responseReturn } = require("../../utils/response");
 const QueryProducts = require("../../utils/queryProducts");
 
@@ -175,8 +177,40 @@ class HomeControllers {
   };
 
   customer_review = async (req, res) => {
-    
-  }
+    const { name, rating, review, productId } = req.body;
+
+    try {
+      await reviewModel.create({
+        productId,
+        name,
+        rating,
+        review,
+        date: moment(Date.now()).format("LL"),
+      });
+
+      let rat = 0;
+      const reviews = await reviewModel.find({
+        productId,
+      });
+
+      for (let i = 0; i < reviews.length; i++) {
+        rat = reviews[i].rating;
+      }
+
+      let productRating = 0;
+      if (reviews.length !== 0) {
+        productRating = (rat / reviews.length).toFixed(1);
+      }
+
+      await productModel.findByIdAndUpdate(productId, {
+        rating: productRating,
+      });
+
+      responseReturn(res, 201, { message: "Ratings added successfully" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
 }
 
 module.exports = new HomeControllers();

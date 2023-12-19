@@ -402,7 +402,7 @@ const Details = () => {
             <div className="w-[28%] md-lg:w-full">
               <div className="pl-4 md-lg:pl-0">
                 <div className="px-3 py-2 text-slate-600 bg-slate-200">
-                  <h2>From ABC Fashion</h2>
+                  <h2>From {product.shopName}</h2>
                 </div>
                 <div className="flex flex-col gap-5 mt-3 border p-3">
                   {moreProducts.map((p, i) => {

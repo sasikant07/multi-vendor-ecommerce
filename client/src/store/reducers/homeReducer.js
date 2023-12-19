@@ -134,6 +134,12 @@ const homeReducer = createSlice({
       state.relatedProducts = action.payload.relatedProducts;
       state.moreProducts = action.payload.moreProducts;
     });
+    builder.addCase(customer_review.fulfilled, (state, action) => {
+      state.successMessage = action.payload.message;
+    });
+    builder.addCase(customer_review.rejected, (state, action) => {
+      state.errorMessage = action.payload.error;
+    });
   },
 });
 

@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import RatingReact from "react-rating";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import Ratings from "./Ratings";
 import RatingTemp from "./RatingTemp";
 import Pagination from "./Pagination";
 import { CiStar } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { customer_review } from "../store/reducers/homeReducer";
+import { customer_review, messageClear } from "../store/reducers/homeReducer";
 
 const Reviews = ({ product }) => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
+  const { errorMessage, successMessage } = useSelector((state) => state.home);
   const [pageNumber, setPageNumber] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [rat, setRat] = useState("");
@@ -22,11 +24,25 @@ const Reviews = ({ product }) => {
     const obj = {
       name: userInfo.name,
       review: rev,
-      rat: rat,
+      rating: rat,
       productId: product._id,
     };
     dispatch(customer_review(obj));
   };
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      setRat("");
+      setRev("");
+      dispatch(messageClear());
+    }
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [errorMessage, successMessage]);
 
   return (
     <div className="mt-8">
@@ -152,12 +168,14 @@ const Reviews = ({ product }) => {
             </div>
             <form onSubmit={reviewSubmit}>
               <textarea
+                value={rev}
                 onChange={(e) => setRev(e.target.value)}
                 className="border outline-0 p-3 w-full"
                 name=""
                 id=""
                 cols="30"
                 rows="5"
+                required
               ></textarea>
               <div className="mt-2">
                 <button className="py-1 px-5 bg-indigo-500 text-white rounded-sm">
