@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Headers from "../components/Headers";
 import Footer from "../components/Footer";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import Carousel from "react-multi-carousel";
+import toast from "react-hot-toast";
 import "react-multi-carousel/lib/styles.css";
 import Ratings from "../components/Ratings";
 import { FaFacebookF, FaLinkedin } from "react-icons/fa";
@@ -15,15 +16,24 @@ import { Pagination } from "swiper/modules";
 import Reviews from "../components/Reviews";
 import { useDispatch, useSelector } from "react-redux";
 import { get_product } from "../store/reducers/homeReducer";
+import {
+  add_to_cart,
+  add_to_wishlist,
+  messageClear,
+} from "../store/reducers/cartReducer";
 
 const Details = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { product, relatedProducts, moreProducts } = useSelector(
     (state) => state.home
   );
+  const { userInfo } = useSelector((state) => state.auth);
+  const { errorMessage, successMessage } = useSelector((state) => state.cart);
   const [image, setImage] = useState("");
   const [state, setState] = useState("reviews");
+  const [quantity, setQuantity] = useState(1);
 
   const responsive = {
     superLargeDesktop: {
@@ -56,12 +66,99 @@ const Details = () => {
     },
   };
 
-  const discount = 15;
-  const stock = 47;
+  const inc = () => {
+    if (quantity >= product.stock) {
+      toast.error("Beyond stock");
+    } else {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const dec = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const add_cart = () => {
+    if (userInfo) {
+      dispatch(
+        add_to_cart({
+          userId: userInfo.id,
+          quantity,
+          productId: product._id,
+        })
+      );
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const add_wishlist = () => {
+    if (userInfo) {
+      dispatch(
+        add_to_wishlist({
+          userId: userInfo.id,
+          productId: product._id,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+          discount: product.discount,
+          rating: product.rating,
+          slug: product.slug,
+        })
+      );
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const buy = () => {
+    let price = 0;
+    if (product.discount !== 0) {
+      price =
+        product.price - Math.floor((product.price * product.discount) / 100);
+    } else {
+      price = product.price;
+    }
+    const obj = [
+      {
+        sellerId: product.sellerId,
+        shopName: product.shopName,
+        price: quantity * (price - Math.floor((price * 5) / 100)),
+        products: [
+          {
+            quantity,
+            productInfo: product,
+          },
+        ],
+      },
+    ];
+    navigate("/shipping", {
+      state: {
+        products: obj,
+        price: price * quantity,
+        shipping_fee: 55,
+        items: 1,
+      },
+    });
+  };
 
   useEffect(() => {
     dispatch(get_product(slug));
   }, [slug]);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [errorMessage, successMessage]);
   return (
     <div>
       <Headers />
@@ -134,17 +231,21 @@ const Details = () => {
                 <span className="text-green-500">(23 reviews)</span>
               </div>
               <div className="text-2xl text-red-500 font-bold flex gap-3">
-                {discount ? (
+                {product.discount !== 0 ? (
                   <>
-                    <h2 className="line-through">${product.price}</h2>
+                    {product.discount !== 0 && (
+                      <h2 className="line-through">${product.price}</h2>
+                    )}
                     <h2 className="text-green-700">
                       $
                       {product.price -
                         Math.floor((product.price * product.discount) / 100)}
                     </h2>
-                    <h2 className="text-orange-500">
-                      -{product.discount}% Off
-                    </h2>
+                    {product.discount !== 0 && (
+                      <h2 className="text-orange-500">
+                        -{product.discount}% Off
+                      </h2>
+                    )}
                   </>
                 ) : (
                   <h2>Price: ${product.price}</h2>
@@ -154,15 +255,22 @@ const Details = () => {
                 <p>{product.description}</p>
               </div>
               <div className="flex gap-3 pb-10 border-b">
-                {stock ? (
+                {product.stock !== 0 ? (
                   <>
                     <div className="flex bg-slate-200 h-[50px] justify-center items-center text-xl">
-                      <div className="px-6 cursor-pointer">-</div>
-                      <div className="px-5">5</div>
-                      <div className="px-6 cursor-pointer">+</div>
+                      <div onClick={dec} className="px-6 cursor-pointer">
+                        -
+                      </div>
+                      <div className="px-5">{quantity}</div>
+                      <div onClick={inc} className="px-6 cursor-pointer">
+                        +
+                      </div>
                     </div>
                     <div className="">
-                      <button className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-purple-500/40 bg-purple-500 text-white">
+                      <button
+                        onClick={add_cart}
+                        className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-purple-500/40 bg-purple-500 text-white"
+                      >
                         Add To Cart
                       </button>
                     </div>
@@ -171,7 +279,10 @@ const Details = () => {
                   ""
                 )}
                 <div className="">
-                  <div className="h-[50px] w-[50px] flex justify-center items-center cursor-pointer hover:shadow-lg hover:shadow-cyan-500/40 bg-cyan-500 text-white">
+                  <div
+                    onClick={add_wishlist}
+                    className="h-[50px] w-[50px] flex justify-center items-center cursor-pointer hover:shadow-lg hover:shadow-cyan-500/40 bg-cyan-500 text-white"
+                  >
                     <AiFillHeart />
                   </div>
                 </div>
@@ -182,8 +293,14 @@ const Details = () => {
                   <span>Share on</span>
                 </div>
                 <div className="flex flex-col gap-5">
-                  <span className={`text-${stock ? "green" : "red"}-500`}>
-                    {stock ? `In Stock (${stock})` : "Out of Stock"}
+                  <span
+                    className={`text-${
+                      product.stock !== 0 ? "green" : "red"
+                    }-500`}
+                  >
+                    {product.stock !== 0
+                      ? `In Stock (${product.stock})`
+                      : "Out of Stock"}
                   </span>
                   <ul className="flex justify-start items-center gap-3">
                     <li>
@@ -223,7 +340,10 @@ const Details = () => {
               </div>
               <div className="flex gap-3">
                 {product.stock ? (
-                  <button className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-emerald-500/40 bg-emerald-500 text-white">
+                  <button
+                    onClick={buy}
+                    className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-emerald-500/40 bg-emerald-500 text-white"
+                  >
                     Buy Now
                   </button>
                 ) : (
@@ -266,7 +386,7 @@ const Details = () => {
                 </div>
                 <div className="">
                   {state === "reviews" ? (
-                    <Reviews />
+                    <Reviews product={product} />
                   ) : (
                     <p className="py-5 text-slate-600">
                       Lorem Ipsum is simply dummy text of the printing and
@@ -285,24 +405,29 @@ const Details = () => {
                   <h2>From ABC Fashion</h2>
                 </div>
                 <div className="flex flex-col gap-5 mt-3 border p-3">
-                  {[1, 2, 3].map((p, i) => {
+                  {moreProducts.map((p, i) => {
                     return (
-                      <Link className="block">
+                      <Link className="block" key={i}>
                         <div className="relative h-[270px]">
                           <img
                             className="w-full h-full"
-                            src={`http://localhost:3000/images/products/${p}.webp`}
+                            src={p?.images[0]}
                             alt=""
                           />
-                          <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                            6%
-                          </div>
+                          {p.discount !== 0 && (
+                            <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
+                              {p.discount}%
+                            </div>
+                          )}
                         </div>
-                        <h2 className="text-slate-600 py-1">
-                          Men's Casual T-Shirt regular fit
-                        </h2>
-                        <div className="flex items-center gap-2">
-                          <Ratings ratings={4.5} />
+                        <h2 className="text-slate-600 py-1">{p.name}</h2>
+                        <div className="flex gap-2">
+                          <h2 className="text-[#6699ff] text-lg font-bold">
+                            ${p.price}
+                          </h2>
+                          <div className="flex items-center gap-2">
+                            <Ratings ratings={p.rating} />
+                          </div>
                         </div>
                       </Link>
                     );
@@ -336,33 +461,35 @@ const Details = () => {
               modules={[Pagination]}
               className="mySwiper"
             >
-              {[1, 2, 3, 4, 5, 6, 7].map((p, i) => {
+              {relatedProducts.map((p, i) => {
                 return (
-                  <SwiperSlide>
+                  <SwiperSlide key={i}>
                     <Link className="block">
                       <div className="relative h-[270px]">
                         <div className="w-full h-full">
                           <img
                             className="w-full h-full"
-                            src={`http://localhost:3000/images/products/${p}.webp`}
+                            src={p?.images[0]}
                             alt=""
                           />
                           <div className="absolute h-full w-full top-0 left-0 bg-[#000] opacity-25 hover:opacity-50 transition-all duration-500"></div>
                         </div>
-                        <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                          6%
-                        </div>
+                        {p.discount !== 0 && (
+                          <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
+                            {p.discount}%
+                          </div>
+                        )}
                       </div>
                       <div className="p-4 flex flex-col gap-1">
                         <h2 className="text-slate-600 text-lg font-semibold">
-                          Men's Casual T-Shirt regular fit
+                          {p.name}
                         </h2>
                         <div className="flex justify-start items-center gap-3">
                           <h2 className="text-[#6699ff] text-lg font-bold">
-                            $747
+                            ${p.price}
                           </h2>
                           <div className="flex items-center gap-2">
-                            <Ratings ratings={4.5} />
+                            <Ratings ratings={p.rating} />
                           </div>
                         </div>
                       </div>

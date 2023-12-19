@@ -173,6 +173,10 @@ class HomeControllers {
       responseReturn(res, 500, { error: error.message });
     }
   };
+
+  customer_review = async (req, res) => {
+    
+  }
 }
 
 module.exports = new HomeControllers();

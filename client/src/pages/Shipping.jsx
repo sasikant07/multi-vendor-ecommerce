@@ -18,7 +18,7 @@ const initialState = {
 
 const Shipping = () => {
   const {
-    state: { products, price, shippingFee, items },
+    state: { products, price, shipping_fee, items },
   } = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ const Shipping = () => {
       place_order({
         price,
         products,
-        shipping_fee: shippingFee,
+        shipping_fee: shipping_fee,
         shippingInfo: state,
         userId: userInfo.id,
         navigate,
@@ -277,15 +277,15 @@ const Shipping = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Delivery Charges</span>
-                    <span className="">${shippingFee}</span>
+                    <span className="">${shipping_fee}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Total Payment</span>
-                    <span className="">${price + shippingFee}</span>
+                    <span className="">${price + shipping_fee}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>Total</span>
-                    <span className="">${price + shippingFee}</span>
+                    <span className="">${price + shipping_fee}</span>
                   </div>
                   <button
                     onClick={placeOrder}

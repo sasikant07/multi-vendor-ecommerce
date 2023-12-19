@@ -25,7 +25,7 @@ class CartController {
       });
 
       if (product) {
-        responseReturn(res, 404, { message: "Product already added to cart" });
+        responseReturn(res, 400, { error: "Product already added to cart" });
       } else {
         const product = await cartModel.create({
           userId,
@@ -204,7 +204,7 @@ class CartController {
 
       if (product) {
         responseReturn(res, 400, {
-          message: "Product already exists in wishlist",
+          error: "Product already exists in wishlist",
         });
       } else {
         await wishlistModel.create(req.body);

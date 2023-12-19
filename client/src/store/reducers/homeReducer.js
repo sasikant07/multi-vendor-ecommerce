@@ -16,6 +16,8 @@ const initialState = {
   product: {},
   relatedProducts: [],
   moreProducts: [],
+  errorMessage: "",
+  successMessage: "",
 };
 
 export const get_category = createAsyncThunk(
@@ -86,10 +88,27 @@ export const get_product = createAsyncThunk(
   }
 );
 
+export const customer_review = createAsyncThunk(
+  "review/customer-review",
+  async (info, thunkAPI) => {
+    try {
+      const { data } = await api.post(`/home/customer/customer-review`, info);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const homeReducer = createSlice({
   name: "home",
   initialState,
-  reducers: {},
+  reducers: {
+    messageClear: (state, _) => {
+      state.errorMessage = "";
+      state.successMessage = "";
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(get_category.pending, (state) => {});
     builder.addCase(get_category.fulfilled, (state, action) => {
@@ -118,6 +137,6 @@ const homeReducer = createSlice({
   },
 });
 
-// export const {} = homeReducer.actions;
+export const { messageClear } = homeReducer.actions;
 
 export default homeReducer.reducer;

@@ -6,12 +6,28 @@ import RatingTemp from "./RatingTemp";
 import Pagination from "./Pagination";
 import { CiStar } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { customer_review } from "../store/reducers/homeReducer";
 
-const Reviews = () => {
+const Reviews = ({ product }) => {
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
   const [pageNumber, setPageNumber] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [rat, setRat] = useState("");
-  const userInfo = {};
+  const [rev, setRev] = useState("");
+
+  const reviewSubmit = (e) => {
+    e.preventDefault();
+    const obj = {
+      name: userInfo.name,
+      review: rev,
+      rat: rat,
+      productId: product._id,
+    };
+    dispatch(customer_review(obj));
+  };
+
   return (
     <div className="mt-8">
       <div className="flex gap-10 md:flex-col">
@@ -134,8 +150,9 @@ const Reviews = () => {
                 }
               />
             </div>
-            <form>
+            <form onSubmit={reviewSubmit}>
               <textarea
+                onChange={(e) => setRev(e.target.value)}
                 className="border outline-0 p-3 w-full"
                 name=""
                 id=""

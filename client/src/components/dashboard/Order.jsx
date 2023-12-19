@@ -78,7 +78,7 @@ const Order = () => {
                   <div className="flex text-sm flex-col justify-start items-start">
                     <Link>{p.name}</Link>
                     <p>
-                      <span>Brand: {p.brand}</span>
+                      <span>Brand: {p.brand}, </span>
                       <span>Quantity: {p.quantity}</span>
                     </p>
                   </div>
