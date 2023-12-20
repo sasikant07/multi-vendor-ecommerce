@@ -18,6 +18,9 @@ const initialState = {
   moreProducts: [],
   errorMessage: "",
   successMessage: "",
+  totalReview: 0,
+  reviews: [],
+  rating_review: [],
 };
 
 export const get_category = createAsyncThunk(
@@ -100,6 +103,20 @@ export const customer_review = createAsyncThunk(
   }
 );
 
+export const get_reviews = createAsyncThunk(
+  "review/get-reviews",
+  async ({ productId, pageNumber }, thunkAPI) => {
+    try {
+      const { data } = await api.get(
+        `/home/customer/get-reviews/${productId}?pageNo=${pageNumber}`
+      );
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const homeReducer = createSlice({
   name: "home",
   initialState,
@@ -139,6 +156,11 @@ const homeReducer = createSlice({
     });
     builder.addCase(customer_review.rejected, (state, action) => {
       state.errorMessage = action.payload.error;
+    });
+    builder.addCase(get_reviews.fulfilled, (state, action) => {
+      state.reviews = action.payload.reviews;
+      state.totalReview = action.payload.totalReview;
+      state.rating_review = action.payload.rating_review;
     });
   },
 });

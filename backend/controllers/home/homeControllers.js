@@ -1,4 +1,7 @@
 const moment = require("moment");
+const {
+  mongo: { ObjectId },
+} = require("mongoose");
 const categoryModel = require("../../models/categoryModel");
 const productModel = require("../../models/productModel");
 const reviewModel = require("../../models/reviewModel");
@@ -194,7 +197,7 @@ class HomeControllers {
       });
 
       for (let i = 0; i < reviews.length; i++) {
-        rat = reviews[i].rating;
+        rat = rat + reviews[i].rating;
       }
 
       let productRating = 0;
@@ -207,6 +210,90 @@ class HomeControllers {
       });
 
       responseReturn(res, 201, { message: "Ratings added successfully" });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_reviews = async (req, res) => {
+    const { productId } = req.params;
+    let { pageNo } = req.query;
+
+    pageNo = parseInt(pageNo);
+    const limit = 5;
+    const skipPage = limit * (pageNo - 1);
+
+    try {
+      let getRating = await reviewModel.aggregate([
+        {
+          $match: {
+            productId: {
+              $eq: new ObjectId(productId),
+            },
+            rating: {
+              $not: {
+                $size: 0,
+              },
+            },
+          },
+        },
+        {
+          $unwind: "$rating",
+        },
+        {
+          $group: {
+            _id: "$rating",
+            count: {
+              $sum: 1, //   count all star individual total rating
+            },
+          },
+        },
+      ]);
+
+      let rating_review = [
+        {
+          rating: 5,
+          sum: 0,
+        },
+        {
+          rating: 4,
+          sum: 0,
+        },
+        {
+          rating: 3,
+          sum: 0,
+        },
+        {
+          rating: 2,
+          sum: 0,
+        },
+        {
+          rating: 1,
+          sum: 0,
+        },
+      ];
+
+      for (let i = 0; i < rating_review.length; i++) {
+        for (let j = 0; j < getRating.length; j++) {
+          if (rating_review[i].rating === getRating[j]._id) {
+            rating_review[i].sum = getRating[j].count;
+            break;
+          }
+        }
+      }
+
+      const getAll = await reviewModel.find({ productId });
+      const reviews = await reviewModel
+        .find({ productId })
+        .skip(skipPage)
+        .limit(limit)
+        .sort({ createdAt: -1 });
+
+      responseReturn(res, 200, {
+        reviews,
+        totalReview: getAll.length,
+        rating_review,
+      });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }

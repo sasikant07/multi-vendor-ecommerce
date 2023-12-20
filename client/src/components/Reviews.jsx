@@ -8,12 +8,17 @@ import Pagination from "./Pagination";
 import { CiStar } from "react-icons/ci";
 import { AiFillStar } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { customer_review, messageClear } from "../store/reducers/homeReducer";
+import {
+  customer_review,
+  get_reviews,
+  messageClear,
+} from "../store/reducers/homeReducer";
 
 const Reviews = ({ product }) => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const { errorMessage, successMessage } = useSelector((state) => state.home);
+  const { errorMessage, successMessage, reviews, totalReview, rating_review } =
+    useSelector((state) => state.home);
   const [pageNumber, setPageNumber] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [rat, setRat] = useState("");
@@ -33,6 +38,12 @@ const Reviews = ({ product }) => {
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
+      dispatch(
+        get_reviews({
+          productId: product._id,
+          pageNumber,
+        })
+      );
       setRat("");
       setRev("");
       dispatch(messageClear());
@@ -44,18 +55,29 @@ const Reviews = ({ product }) => {
     }
   }, [errorMessage, successMessage]);
 
+  useEffect(() => {
+    if (product._id) {
+      dispatch(
+        get_reviews({
+          productId: product._id,
+          pageNumber,
+        })
+      );
+    }
+  }, [pageNumber, product]);
+
   return (
     <div className="mt-8">
       <div className="flex gap-10 md:flex-col">
         <div className="flex flex-col gap-2 justify-start items-start py-4">
           <div className="">
-            <span className="text-6xl font-semibold">4.5</span>
+            <span className="text-6xl font-semibold">{product.rating}</span>
             <span className="text-3xl font-semibold text-slate-600">/5</span>
           </div>
           <div className="flex text-4xl">
-            <Ratings ratings={4.5} />
+            <Ratings ratings={product.rating} />
           </div>
-          <p className="text-sm text-slate-600">27 Ratings</p>
+          <p className="text-sm text-slate-600">{totalReview} Reviews</p>
         </div>
         <div className="flex gap-2 flex-col py-4">
           <div className="flex justify-start items-center gap-5">
@@ -63,45 +85,90 @@ const Reviews = ({ product }) => {
               <RatingTemp rating={5} />
             </div>
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#EDBB0E] w-[60%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[0]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#EDBB0E]"
+              ></div>
             </div>
-            <p className="text-sm text-slate-600 w-[0%]">10</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[0]?.sum}
+            </p>
           </div>
           <div className="flex justify-start items-center gap-5">
             <div className="text-md flex gap-1 w-[93px]">
               <RatingTemp rating={4} />
             </div>
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#EDBB0E] w-[70%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[1]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#EDBB0E]"
+              ></div>
             </div>
-            <p className="text-sm text-slate-600 w-[0%]">20</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[1]?.sum}
+            </p>
           </div>
           <div className="flex justify-start items-center gap-5">
             <div className="text-md flex gap-1 w-[93px]">
               <RatingTemp rating={3} />
             </div>
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#EDBB0E] w-[40%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[2]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#EDBB0E]"
+              ></div>
             </div>
-            <p className="text-sm text-slate-600 w-[0%]">8</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[2]?.sum}
+            </p>
           </div>
           <div className="flex justify-start items-center gap-5">
             <div className="text-md flex gap-1 w-[93px]">
               <RatingTemp rating={2} />
             </div>
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#EDBB0E] w-[30%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[3]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#EDBB0E]"
+              ></div>
             </div>
-            <p className="text-sm text-slate-600 w-[0%]">5</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[3]?.sum}
+            </p>
           </div>
           <div className="flex justify-start items-center gap-5">
             <div className="text-md flex gap-1 w-[93px]">
               <RatingTemp rating={1} />
             </div>
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#EDBB0E] w-[10%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[4]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#EDBB0E]"
+              ></div>
             </div>
-            <p className="text-sm text-slate-600 w-[0%]">3</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[4]?.sum}
+            </p>
           </div>
           <div className="flex justify-start items-center gap-5">
             <div className="text-md flex gap-1 w-[93px]">
@@ -116,35 +183,32 @@ const Reviews = ({ product }) => {
       </div>
       <div className="">
         <h2 className="text-slate-600 text-xl font-bold py-5">
-          Product Reviews 43
+          Product Reviews {totalReview}
         </h2>
         <div className="flex flex-col gap-8 pb-10 pt-4">
-          {[1, 2, 3, 4, 5, 6].map((r, i) => (
+          {reviews.map((r, i) => (
             <div key={i} className="flex flex-col gap-1">
               <div className="flex justify-between items-center">
                 <div className="flex gap-1 text-xl">
-                  <RatingTemp rating={4} />
+                  <RatingTemp rating={r.rating} />
                 </div>
-                <span className="text-slate-600">7 July 2023</span>
+                <span className="text-slate-600">{r.date}</span>
               </div>
-              <span className="text-slate-600 text-md">John Doe</span>
-              <p className="text-slate-600 text-sm">
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book.
-              </p>
+              <span className="text-slate-600 text-md">{r.name}</span>
+              <p className="text-slate-600 text-sm">{r.review}</p>
             </div>
           ))}
         </div>
         <div className="flex justify-end">
-          <Pagination
-            pageNumber={pageNumber}
-            setPageNumber={setPageNumber}
-            totalItem={20}
-            perPage={perPage}
-            showItem={Math.floor(20 / 3)}
-          />
+          {totalReview > 5 && (
+            <Pagination
+              pageNumber={pageNumber}
+              setPageNumber={setPageNumber}
+              totalItem={totalReview}
+              perPage={perPage}
+              showItem={Math.round(totalReview / 5)}
+            />
+          )}
         </div>
       </div>
       <div className="">
