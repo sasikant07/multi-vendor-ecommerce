@@ -10,6 +10,7 @@ import { AiFillStar } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import {
   customer_review,
+  get_product,
   get_reviews,
   messageClear,
 } from "../store/reducers/homeReducer";
@@ -44,6 +45,7 @@ const Reviews = ({ product }) => {
           pageNumber,
         })
       );
+      dispatch(get_product(product.slug));
       setRat("");
       setRev("");
       dispatch(messageClear());
