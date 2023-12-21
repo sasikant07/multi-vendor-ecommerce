@@ -1,9 +1,11 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const http = require("http");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const categoryRoutes = require("./routes/dashboard/categoryRoutes");
 const productRoutes = require("./routes/dashboard/productRoutes");
 const sellerRoutes = require("./routes/dashboard/sellerRoutes");
@@ -12,15 +14,64 @@ const customerAuthRoutes = require("./routes/home/customerAuthRoutes");
 const cartRoutes = require("./routes/home/cartRoutes");
 const orderRoutes = require("./routes/order/orderRoutes");
 const { dbConnect } = require("./utils/db");
+const socket = require("socket.io");
 dotenv.config();
 const app = express();
 
+const server = http.createServer(app);
+
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://localhost:3030"],
     credentials: true,
   })
 );
+
+const io = socket(server, {
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+});
+
+var allCustomer = [];
+var allSeller = [];
+
+const addUser = (customerId, socketId, userInfo) => {
+  const checkUser = allCustomer.some((u) => u.customerId === customerId);
+
+  if (!checkUser) {
+    allCustomer.push({
+      customerId,
+      socketId,
+      userInfo,
+    });
+  }
+};
+
+const addSeller = (sellerId, socketId, userInfo) => {
+  const checkSeller = allSeller.some((u) => u.sellerId === sellerId);
+
+  if (!checkSeller) {
+    allSeller.push({
+      sellerId,
+      socketId,
+      userInfo,
+    });
+  }
+};
+
+io.on("connection", (soc) => {
+  console.log("Socket server is connected...");
+
+  soc.on("add_user", (customerId, userInfo) => {
+    addUser(customerId, soc.id, userInfo);
+  });
+  soc.on("add_seller", (sellerId, userInfo) => {
+    addSeller(sellerId, soc.id, userInfo);
+  });
+});
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -32,7 +83,9 @@ app.use("/api/home", homeRoutes);
 app.use("/api", customerAuthRoutes);
 app.use("/api", cartRoutes);
 app.use("/api", orderRoutes);
+app.use("/api", orderRoutes);
+app.use("/api", chatRoutes);
 
 const port = process.env.PORT;
 dbConnect();
-app.listen(port, () => console.log(`Server running on port ${port}`));
+server.listen(port, () => console.log(`Server running on port ${port}`));

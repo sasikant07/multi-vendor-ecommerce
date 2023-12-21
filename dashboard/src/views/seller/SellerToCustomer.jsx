@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaList } from "react-icons/fa";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { get_customers, messageClear } from "../../store/Reducers/chatReducer";
 
 const SellerToCustomer = () => {
+  const { customerId } = useParams();
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
   const [show, setShow] = useState(false);
   const sellerId = 32;
+
+  useEffect(() => {
+    dispatch(get_customers(userInfo._id));
+  }, []);
   return (
     <div className="px-2 lg:px-7 py-5">
       <div className="w-full bg-[#283046] px-4 py-4 rounded-md h-[calc(100vh-140px)]">
@@ -89,7 +99,9 @@ const SellerToCustomer = () => {
                     />
                     <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
                   </div>
-                  <h2 className="text-base text-white font-semibold]">Smith Jones</h2>
+                  <h2 className="text-base text-white font-semibold]">
+                    Smith Jones
+                  </h2>
                 </div>
               )}
               <div
