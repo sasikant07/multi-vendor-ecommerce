@@ -61,6 +61,10 @@ const addSeller = (sellerId, socketId, userInfo) => {
   }
 };
 
+const findCustomer = (customerId) => {
+  return allCustomer.find((c) => c.customerId === customerId);
+};
+
 io.on("connection", (soc) => {
   console.log("Socket server is connected...");
 
@@ -68,7 +72,13 @@ io.on("connection", (soc) => {
     addUser(customerId, soc.id, userInfo);
   });
   soc.on("add_seller", (sellerId, userInfo) => {
-    addSeller(sellerId, soc.id, userInfo);
+    addSeller(sellerId, userInfo);
+  });
+  soc.on("send_seller_message", (msg) => {
+    const customer = findCustomer(msg.receiverId);
+    if (customer !== undefined) {
+      soc.to(customer.socketId).emit("seller_message", msg);
+    }
   });
 });
 

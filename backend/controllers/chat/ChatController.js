@@ -191,6 +191,124 @@ class ChatController {
       responseReturn(res, 500, { error: error.message });
     }
   };
+
+  get_customers = async (req, res) => {
+    const { sellerId } = req.params;
+
+    try {
+      const data = await sellerCustomerModel.findOne({ myId: sellerId });
+      responseReturn(res, 200, {
+        customers: data.myFriends,
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_customer_seller_message = async (req, res) => {
+    const { customerId } = req.params;
+    const { id } = req; // sellerId from cookies
+
+    try {
+      const messages = await sellerCustomerMessageModel.find({
+        $or: [
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: customerId,
+                },
+              },
+              {
+                senderId: {
+                  $eq: id,
+                },
+              },
+            ],
+          },
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: id,
+                },
+              },
+              {
+                senderId: {
+                  $eq: customerId,
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      const currentcustomer = await customerModel.findById(customerId);
+
+      responseReturn(res, 200, { messages, currentcustomer });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  send_seller_message = async (req, res) => {
+    const { senderId, receiverId, text, name } = req.body;
+
+    try {
+      const message = await sellerCustomerMessageModel.create({
+        senderId,
+        senderName: name,
+        receiverId,
+        message: text,
+      });
+
+      const data = await sellerCustomerModel.findOne({ myId: senderId });
+      let myFriends = data.myFriends;
+      let index = myFriends.findIndex((f) => f.fdId === receiverId);
+
+      // put receiver name on top on the friend list after sending message
+      while (index > 0) {
+        let temp = myFriends[index];
+        myFriends[index] = myFriends[index - 1];
+        myFriends[index - 1] = temp;
+        index--;
+      }
+
+      await sellerCustomerModel.updateOne(
+        {
+          myId: senderId,
+        },
+        {
+          myFriends,
+        }
+      );
+
+      const data1 = await sellerCustomerModel.findOne({ myId: receiverId });
+
+      let myFriends1 = data1.myFriends;
+      let index1 = myFriends1.findIndex((f) => f.fdId === senderId);
+
+      while (index1 > 0) {
+        let temp1 = myFriends1[index];
+        myFriends1[index1] = myFriends1[index1 - 1];
+        myFriends1[index1 - 1] = temp1;
+        index1--;
+      }
+
+      await sellerCustomerModel.updateOne(
+        {
+          myId: receiverId,
+        },
+        {
+          myFriends1,
+        }
+      );
+
+      responseReturn(res, 201, { message });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
 }
 
 module.exports = new ChatController();

@@ -6,6 +6,7 @@ const initialState = {
   fd_messages: [],
   currentFd: "",
   successMessage: "",
+  errorMessage: "",
 };
 
 export const add_friend = createAsyncThunk(
@@ -41,7 +42,15 @@ export const send_message = createAsyncThunk(
 const chatReducer = createSlice({
   name: "chat",
   initialState,
-  reducers: {},
+  reducers: {
+    messageClear: (state) => {
+      state.errorMessage = "";
+      state.successMessage = "";
+    },
+    updateMessage: (state, action) => {
+      state.fd_messages = [...state.fd_messages, action.payload];
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(add_friend.fulfilled, (state, action) => {
       state.fd_messages = action.payload.messages;
@@ -68,6 +77,6 @@ const chatReducer = createSlice({
   },
 });
 
-// export const {} = chatReducer.actions
+export const { messageClear, updateMessage } = chatReducer.actions;
 
 export default chatReducer.reducer;

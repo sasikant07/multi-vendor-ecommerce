@@ -5,7 +5,8 @@ import { IoSend } from "react-icons/io5";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import io from "socket.io-client";
-import { add_friend, send_message } from "../../store/reducers/chatReducer";
+import toast from "react-hot-toast";
+import { add_friend, send_message, updateMessage } from "../../store/reducers/chatReducer";
 
 const socket = io("http://localhost:8080");
 
@@ -17,6 +18,7 @@ const Chat = () => {
     (state) => state.chat
   );
   const [text, setText] = useState("");
+  const [receiverMessage, setReceiverMessage] = useState("");
 
   const send = () => {
     if (text) {
@@ -35,6 +37,25 @@ const Chat = () => {
   useEffect(() => {
     socket.emit("add_user", userInfo.id, userInfo);
   }, []);
+
+  useEffect(() => {
+    socket.on("seller_message", (msg) => {
+      setReceiverMessage(msg);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (receiverMessage) {
+      if (
+        sellerId === receiverMessage.senderId &&
+        userInfo.id === receiverMessage.receiverId
+      ) {
+        dispatch(updateMessage(receiverMessage));
+      } else {
+        toast.success(receiverMessage.senderName + " " + "sent a message");
+      }
+    }
+  }, [receiverMessage]);
 
   useEffect(() => {
     dispatch(
@@ -86,7 +107,7 @@ const Chat = () => {
                   {fd_messages.map((m, i) => {
                     if (currentFd?.fdId !== m.receiverId) {
                       return (
-                        <div className="w-full flex gap-2 justify-start items-center text-[14px]">
+                        <div key={i} className="w-full flex gap-2 justify-start items-center text-[14px]">
                           <img
                             className="w-[30px] h-[30px]"
                             src="http://localhost:3000/images/admin.jpg"
@@ -99,7 +120,7 @@ const Chat = () => {
                       );
                     } else {
                       return (
-                        <div className="w-full flex gap-2 justify-end items-center text-[14px]">
+                        <div key={i} className="w-full flex gap-2 justify-end items-center text-[14px]">
                           <img
                             className="w-[30px] h-[30px]"
                             src="http://localhost:3000/images/admin.jpg"
