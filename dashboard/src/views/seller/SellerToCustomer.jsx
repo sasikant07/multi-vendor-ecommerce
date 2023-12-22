@@ -1,26 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaList } from "react-icons/fa";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import {
   get_customer_seller_message,
   get_customers,
   messageClear,
   send_message,
+  updateMessage,
 } from "../../store/Reducers/chatReducer";
 import { socket } from "../../utils/utils";
+import { BsEmojiSmile } from "react-icons/bs";
 
 const SellerToCustomer = () => {
   const { customerId } = useParams();
   const dispatch = useDispatch();
+  const scrollRef = useRef();
   const { userInfo } = useSelector((state) => state.auth);
-  const { customers, messages, currentCustomer, successMessage } = useSelector(
-    (state) => state.chat
-  );
+  const {
+    customers,
+    messages,
+    currentCustomer,
+    successMessage,
+    activeCustomer,
+  } = useSelector((state) => state.chat);
   const [show, setShow] = useState(false);
   const [text, setText] = useState("");
-  const sellerId = 32;
+  const [receiverMessage, setReceiverMessage] = useState("");
 
   const send = (e) => {
     e.preventDefault();
@@ -47,10 +55,34 @@ const SellerToCustomer = () => {
 
   useEffect(() => {
     if (successMessage) {
-      socket.emit("send_seller_message", messages.length - 1);
+      socket.emit("send_seller_message", messages[messages.length - 1]);
       dispatch(messageClear());
     }
   }, [successMessage]);
+
+  useEffect(() => {
+    socket.on("customer_message", (msg) => {
+      setReceiverMessage(msg);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (receiverMessage) {
+      if (
+        customerId === receiverMessage.senderId &&
+        userInfo._id === receiverMessage.receiverId
+      ) {
+        dispatch(updateMessage(receiverMessage));
+      } else {
+        toast.success(receiverMessage.senderName + " " + "sent a message");
+        dispatch(messageClear());
+      }
+    }
+  }, [receiverMessage]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
+  }, [messages]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -79,11 +111,13 @@ const SellerToCustomer = () => {
                 >
                   <div className="relative">
                     <img
-                      className="w-[38px] h-[38px] border border-white border-2 max-w-[38px] p-[2px] rounded-full"
+                      className="w-[38px] h-[38px] border border-white max-w-[38px] p-[2px] rounded-full"
                       src="http://localhost:3030/images/admin.jpg"
                       alt=""
                     />
-                    <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                    {activeCustomer.some((a) => a.customerId === c.fdId) && (
+                      <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                    )}
                   </div>
                   <div className="flex justify-center items-start flex-col w-full">
                     <div className="flex justify-between items-center w-full">
@@ -96,15 +130,19 @@ const SellerToCustomer = () => {
           </div>
           <div className="w-full md:w-[calc(100%-200px)] md:pl-4">
             <div className="flex justify-between items-center">
-              {userInfo._id && (
+              {customerId && (
                 <div className="flex justify-start items-center gap-3">
                   <div className="relative">
                     <img
-                      className="w-[42px] h-[42px] border border-green-500 border-2 max-w-[42px] p-[2px] rounded-full"
+                      className="w-[42px] h-[42px] border-2 border-green-500 max-w-[42px] p-[2px] rounded-full"
                       src="http://localhost:3030/images/admin.jpg"
                       alt=""
                     />
-                    <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                    {activeCustomer.some(
+                      (a) => a.customerId === currentCustomer._id
+                    ) && (
+                      <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                    )}
                   </div>
                   <h2 className="text-base text-white font-semibold]">
                     {currentCustomer.name}
@@ -128,6 +166,7 @@ const SellerToCustomer = () => {
                       return (
                         <div
                           className="w-full flex justify-start items-center"
+                          ref={scrollRef}
                           key={i}
                         >
                           <div className="flex justify-start items-start gap-2 md:px-3 py-2 max-w-full lg:max-w-[85%]">
@@ -148,6 +187,7 @@ const SellerToCustomer = () => {
                       return (
                         <div
                           key={i}
+                          ref={scrollRef}
                           className="w-full flex justify-end items-center"
                         >
                           <div className="flex justify-start items-start gap-2 md:px-3 py-2 max-w-full lg:max-w-[85%]">
@@ -167,7 +207,12 @@ const SellerToCustomer = () => {
                     }
                   })
                 ) : (
-                  <div></div>
+                  <div className="w-full h-full flex justify-center items-center flex-col gap-2 text-white">
+                    <span>
+                      <BsEmojiSmile />
+                    </span>
+                    <span>Select customer to chat</span>
+                  </div>
                 )}
               </div>
             </div>
@@ -179,9 +224,13 @@ const SellerToCustomer = () => {
                 type="text"
                 name=""
                 id=""
+                readOnly={customerId ? false : true}
                 placeholder="Type your message here..."
               />
-              <button className="bg-cyan-500 shadow-lg hover:shadow-cyan-500/50 font-semibold w-[75px] h-[35px] rounded-md text-white flex justify-center items-center">
+              <button
+                disabled={customerId ? false : true}
+                className="bg-cyan-500 shadow-lg hover:shadow-cyan-500/50 font-semibold w-[75px] h-[35px] rounded-md text-white flex justify-center items-center"
+              >
                 Send
               </button>
             </form>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineMessage, AiOutlinePlus } from "react-icons/ai";
 import { GrEmoji } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
@@ -6,19 +6,26 @@ import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import io from "socket.io-client";
 import toast from "react-hot-toast";
-import { add_friend, send_message, updateMessage } from "../../store/reducers/chatReducer";
+import {
+  add_friend,
+  messageClear,
+  send_message,
+  updateMessage,
+} from "../../store/reducers/chatReducer";
 
 const socket = io("http://localhost:8080");
 
 const Chat = () => {
   const { sellerId } = useParams();
   const dispatch = useDispatch();
+  const scrollRef = useRef();
   const { userInfo } = useSelector((state) => state.auth);
-  const { my_friends, fd_messages, currentFd } = useSelector(
+  const { my_friends, fd_messages, currentFd, successMessage } = useSelector(
     (state) => state.chat
   );
   const [text, setText] = useState("");
   const [receiverMessage, setReceiverMessage] = useState("");
+  const [activeSeller, setActiveSeller] = useState([]);
 
   const send = () => {
     if (text) {
@@ -42,6 +49,9 @@ const Chat = () => {
     socket.on("seller_message", (msg) => {
       setReceiverMessage(msg);
     });
+    socket.on("activeSeller", (sellers) => {
+      setActiveSeller(sellers);
+    });
   }, []);
 
   useEffect(() => {
@@ -53,6 +63,7 @@ const Chat = () => {
         dispatch(updateMessage(receiverMessage));
       } else {
         toast.success(receiverMessage.senderName + " " + "sent a message");
+        dispatch(messageClear());
       }
     }
   }, [receiverMessage]);
@@ -65,6 +76,17 @@ const Chat = () => {
       })
     );
   }, [sellerId]);
+
+  useEffect(() => {
+    if (successMessage) {
+      socket.emit("send_customer_message", fd_messages[fd_messages.length - 1]);
+      dispatch(messageClear());
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
+  }, [fd_messages]);
 
   return (
     <div className="bg-white p-3 rounded-md">
@@ -84,7 +106,9 @@ const Chat = () => {
                 key={i}
               >
                 <div className="w-[30px] h-[30px] rounded-full relative">
-                  <div className="w-[10px] h-[10px] rounded-full bg-green-500 absolute right-0 bottom-0"></div>
+                  {activeSeller.some((c) => c.sellerId === f.fdId) && (
+                    <div className="w-[10px] h-[10px] rounded-full bg-green-500 absolute right-0 bottom-0"></div>
+                  )}
                   <img src="http://localhost:3000/images/admin.jpg" alt="" />
                 </div>
                 <span>{f.name}</span>
@@ -97,7 +121,9 @@ const Chat = () => {
             <div className="w-full max-h-full">
               <div className="flex justify-start gap-3 items-center text-slate-600 text-xl h-[50px]">
                 <div className="w-[30px] h-[30px] rounded-full relative">
-                  <div className="w-[10px] h-[10px] rounded-full bg-green-500 absolute right-0 bottom-0"></div>
+                  {activeSeller.some((c) => c.sellerId === currentFd.fdId) && (
+                    <div className="w-[10px] h-[10px] rounded-full bg-green-500 absolute right-0 bottom-0"></div>
+                  )}
                   <img src="http://localhost:3000/images/admin.jpg" alt="" />
                 </div>
                 <span>{currentFd.name}</span>
@@ -107,7 +133,11 @@ const Chat = () => {
                   {fd_messages.map((m, i) => {
                     if (currentFd?.fdId !== m.receiverId) {
                       return (
-                        <div key={i} className="w-full flex gap-2 justify-start items-center text-[14px]">
+                        <div
+                          key={i}
+                          ref={scrollRef}
+                          className="w-full flex gap-2 justify-start items-center text-[14px]"
+                        >
                           <img
                             className="w-[30px] h-[30px]"
                             src="http://localhost:3000/images/admin.jpg"
@@ -120,7 +150,11 @@ const Chat = () => {
                       );
                     } else {
                       return (
-                        <div key={i} className="w-full flex gap-2 justify-end items-center text-[14px]">
+                        <div
+                          key={i}
+                          ref={scrollRef}
+                          className="w-full flex gap-2 justify-end items-center text-[14px]"
+                        >
                           <img
                             className="w-[30px] h-[30px]"
                             src="http://localhost:3000/images/admin.jpg"
