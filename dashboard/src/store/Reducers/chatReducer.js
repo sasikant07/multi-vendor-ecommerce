@@ -7,11 +7,12 @@ const initialState = {
   customers: [],
   messages: [],
   activeCustomer: [],
-  activeSeller: [],
+  activeSellers: [],
   messageNotification: [],
   activeAdmin: "",
   friends: [],
   seller_admin_message: [],
+  sellers: [],
   currentSeller: {},
   currentCustomer: {},
 };
@@ -57,6 +58,30 @@ export const send_message = createAsyncThunk(
   }
 );
 
+export const get_sellers = createAsyncThunk(
+  "chat/get-sellers",
+  async (_, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/chat/admin/get-sellers`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const send_message_seller_admin = createAsyncThunk(
+  "chat/message-send-seller-admin",
+  async (info, thunkAPI) => {
+    try {
+      const { data } = await api.post(`/chat/message-send-seller-admin`, info);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const chatReducer = createSlice({
   name: "chat",
   initialState,
@@ -70,6 +95,9 @@ const chatReducer = createSlice({
     },
     updateCustomer: (state, action) => {
       state.activeCustomer = action.payload;
+    },
+    updateSellers: (state, action) => {
+      state.activeSellers = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -97,10 +125,19 @@ const chatReducer = createSlice({
       state.messages = [...state.messages, action.payload.message];
       state.successMessage = "Message sent";
     });
+    builder.addCase(get_sellers.fulfilled, (state, action) => {
+      state.sellers = action.payload.sellers;
+    });
+    builder.addCase(send_message_seller_admin.fulfilled, (state, action) => {
+      state.seller_admin_message = [
+        ...state.seller_admin_message,
+        action.payload.message,
+      ];
+    });
   },
 });
 
-export const { messageClear, updateMessage, updateCustomer } =
+export const { messageClear, updateMessage, updateCustomer, updateSellers } =
   chatReducer.actions;
 
 export default chatReducer.reducer;

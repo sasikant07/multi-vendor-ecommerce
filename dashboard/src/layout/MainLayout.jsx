@@ -4,7 +4,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { socket } from "../utils/utils";
 import { useSelector, useDispatch } from "react-redux";
-import { updateCustomer } from "../store/Reducers/chatReducer";
+import { updateCustomer, updateSellers } from "../store/Reducers/chatReducer";
 
 const MainLayout = () => {
   const dispatch = useDispatch();
@@ -12,18 +12,21 @@ const MainLayout = () => {
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
-    if (userInfo && userInfo.role === "seller") {
-      socket.emit("add_seller", userInfo._id, userInfo);
+    if (userInfo && userInfo.role === 'seller') {
+      socket.emit('add_seller', userInfo._id, userInfo)
     } else {
-      socket.emit("add_admin", userInfo);
+      socket.emit('add_admin', userInfo)
     }
-  }, [userInfo]);
+  }, [userInfo])
 
-  useEffect(() => {
-    socket.on("activeCustomer", (customers) => {
-      dispatch(updateCustomer(customers));
-    });
-  }, []);
+  useEffect(()=>{
+    socket.on('activeCustomer',(customers)=>{
+      dispatch(updateCustomer(customers))
+    })
+    socket.on('activeSeller',(sellers)=>{
+      dispatch(updateSellers(sellers))
+    })
+  },[])
 
   return (
     <div className="bg-[#161d31] w-full min-h-screen">

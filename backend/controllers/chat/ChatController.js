@@ -3,6 +3,7 @@ const sellerModel = require("../../models/sellerModel");
 const customerModel = require("../../models/customerModel");
 const sellerCustomerModel = require("../../models/chat/sellerCustomerModel");
 const sellerCustomerMessageModel = require("../../models/chat/sellerCustomerMessageModel");
+const adminSellerMessageModel = require("../../models/chat/adminSellerMessageModel");
 
 class ChatController {
   add_customer_friend = async (req, res) => {
@@ -305,6 +306,32 @@ class ChatController {
       );
 
       responseReturn(res, 201, { message });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_sellers = async (req, res) => {
+    try {
+      const sellers = await sellerModel.find({});
+      responseReturn(res, 200, { sellers });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  seller_admin_message_send = async (req, res) => {
+    const { senderId, receiverId, message, senderName } = req.body;
+
+    try {
+      const messageData = await adminSellerMessageModel.create({
+        senderId,
+        receiverId,
+        senderName,
+        message,
+      });
+
+      responseReturn(res, 201, { message: messageData });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }
