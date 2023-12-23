@@ -139,7 +139,7 @@ const cartReducer = createSlice({
       state.cart_products = action.payload.cart_products;
       state.price = action.payload.price;
       state.cart_product_count = action.payload.cart_product_count;
-      state.shipping_fee = action.payload.shippingFee;
+      state.shipping_fee = action.payload.shipping_fee;
       state.out_of_stock_products = action.payload.outOfStockProduct;
       state.buy_product_item = action.payload.buy_product_item;
     });

@@ -26,6 +26,8 @@ const Shipping = () => {
   const [state, setState] = useState(initialState);
   const [res, setRes] = useState(false);
 
+  console.log("======", products, price, shipping_fee, items);
+
   const inputHandle = (e) => {
     setState({
       ...state,

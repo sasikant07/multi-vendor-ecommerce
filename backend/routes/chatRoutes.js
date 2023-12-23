@@ -21,7 +21,7 @@ router.get(
 );
 router.post(
   "/chat/seller/send-message-to-customer",
-  
+  authMiddleware,
   ChatController.send_seller_message
 );
 

@@ -141,7 +141,7 @@ class CartController {
         cart_products: p,
         price: calculatePrice,
         cart_product_count,
-        shippingFee: 55 * p.length,
+        shipping_fee: 55 * p.length,
         outOfStockProduct,
         buy_product_item,
       });

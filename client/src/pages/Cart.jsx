@@ -33,7 +33,7 @@ const Cart = () => {
       state: {
         products: cart_products,
         price: price,
-        shippingFee: shipping_fee,
+        shipping_fee: shipping_fee,
         items: buy_product_item,
       },
     });
