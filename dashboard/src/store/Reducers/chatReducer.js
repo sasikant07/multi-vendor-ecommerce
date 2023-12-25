@@ -82,6 +82,30 @@ export const send_message_seller_admin = createAsyncThunk(
   }
 );
 
+export const get_admin_message = createAsyncThunk(
+  "chat/get-admin-message",
+  async (receiverId, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/chat/get-admin-messages/${receiverId}`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const get_seller_message = createAsyncThunk(
+  "chat/get-seller-message",
+  async (_, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/chat/get-seller-messages`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const chatReducer = createSlice({
   name: "chat",
   initialState,
@@ -98,6 +122,21 @@ const chatReducer = createSlice({
     },
     updateSellers: (state, action) => {
       state.activeSellers = action.payload;
+    },
+    updateAdminMessage: (state, action) => {
+      state.seller_admin_message = [
+        ...state.seller_admin_message,
+        action.payload,
+      ];
+    },
+    updateSellerMessage: (state, action) => {
+      state.seller_admin_message = [
+        ...state.seller_admin_message,
+        action.payload,
+      ];
+    },
+    activeStatus_update: (state, action) => {
+      state.activeAdmin = action.payload.status;
     },
   },
   extraReducers: (builder) => {
@@ -133,11 +172,26 @@ const chatReducer = createSlice({
         ...state.seller_admin_message,
         action.payload.message,
       ];
+      state.successMessage = "message sent";
+    });
+    builder.addCase(get_admin_message.fulfilled, (state, action) => {
+      state.seller_admin_message = action.payload.messages;
+      state.currentSeller = action.payload.currentSeller;
+    });
+    builder.addCase(get_seller_message.fulfilled, (state, action) => {
+      state.seller_admin_message = action.payload.messages;
     });
   },
 });
 
-export const { messageClear, updateMessage, updateCustomer, updateSellers } =
-  chatReducer.actions;
+export const {
+  messageClear,
+  updateMessage,
+  updateCustomer,
+  updateSellers,
+  updateAdminMessage,
+  updateSellerMessage,
+  activeStatus_update,
+} = chatReducer.actions;
 
 export default chatReducer.reducer;

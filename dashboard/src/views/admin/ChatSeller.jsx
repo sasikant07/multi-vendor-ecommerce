@@ -1,24 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaList } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import {
+  get_admin_message,
   get_sellers,
   messageClear,
   send_message_seller_admin,
+  updateSellerMessage,
 } from "../../store/Reducers/chatReducer";
 import { Link, useParams } from "react-router-dom";
 import { BsEmojiSmile } from "react-icons/bs";
+import { socket } from "../../utils/utils";
 
 const ChatSeller = () => {
+  const scrollRef = useRef();
   const { sellerId } = useParams;
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const { sellers, activeSellers, seller_admin_message } = useSelector(
-    (state) => state.chat
-  );
+  const {
+    sellers,
+    activeSellers,
+    seller_admin_message,
+    currentSeller,
+    successMessage,
+  } = useSelector((state) => state.chat);
   const [show, setShow] = useState(false);
   const [text, setText] = useState("");
+  const [receivedMessage, setReceivedMessage] = useState("");
 
   useEffect(() => {
     dispatch(get_sellers());
@@ -28,13 +38,54 @@ const ChatSeller = () => {
     e.preventDefault();
     dispatch(
       send_message_seller_admin({
-        senderId: userInfo._id,
+        senderId: "",
         receiverId: sellerId,
         message: text,
         senderName: "Shopp.my support",
       })
     );
+    setText("");
   };
+
+  useEffect(() => {
+    if (sellerId) {
+      dispatch(get_admin_message(sellerId));
+    }
+  }, [sellerId]);
+
+  useEffect(() => {
+    if (successMessage) {
+      socket.emit(
+        "send_message_admin_to_seller",
+        seller_admin_message[seller_admin_message.length - 1]
+      );
+      dispatch(messageClear());
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    socket.on("received_seller_message", (msg) => {
+      setReceivedMessage(msg);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (receivedMessage) {
+      if (
+        receivedMessage.senderId === sellerId &&
+        receivedMessage.receiverId === ""
+      ) {
+        dispatch(updateSellerMessage(receivedMessage));
+      } else {
+        toast.success(receivedMessage.senderName + " sent a message");
+      }
+    }
+  }, [receivedMessage]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behaviour: "smooth" });
+  }, [seller_admin_message]);
+
   return (
     <div className="px-2 lg:px-7 py-5">
       <div className="w-full bg-[#283046] px-4 py-4 rounded-md h-[calc(100vh-140px)]">
@@ -92,6 +143,7 @@ const ChatSeller = () => {
                       alt=""
                     />
                     <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                    <span className="text-white">{currentSeller?.name}</span>
                   </div>
                 </div>
               )}
@@ -111,6 +163,7 @@ const ChatSeller = () => {
                     if (m.senderId === sellerId) {
                       return (
                         <div
+                          ref={scrollRef}
                           className="w-full flex justify-start items-center"
                           key={i}
                         >
@@ -131,6 +184,7 @@ const ChatSeller = () => {
                     } else {
                       return (
                         <div
+                          ref={scrollRef}
                           className="w-full flex justify-end items-center"
                           key={i}
                         >

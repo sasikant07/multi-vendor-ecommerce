@@ -336,6 +336,99 @@ class ChatController {
       responseReturn(res, 500, { error: error.message });
     }
   };
+
+  get_admin_messages = async (req, res) => {
+    const { receiverId } = req.params;
+    const { id } = "";
+
+    try {
+      const messages = await adminSellerMessageModel.find({
+        $or: [
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: receiverId,
+                },
+              },
+              {
+                senderId: {
+                  $eq: id,
+                },
+              },
+            ],
+          },
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: id,
+                },
+              },
+              {
+                senderId: {
+                  $eq: receiverId,
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      let currentSeller = {};
+      if (receiverId) {
+        currentSeller = await sellerModel.findById(receiverId);
+      }
+
+      responseReturn(res, 200, { messages, currentSeller });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_seller_messages = async (req, res) => {
+    const { id } = req;
+    const receiverId = "";
+
+    try {
+      const messages = await adminSellerMessageModel.find({
+        $or: [
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: receiverId,
+                },
+              },
+              {
+                senderId: {
+                  $eq: id,
+                },
+              },
+            ],
+          },
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: id,
+                },
+              },
+              {
+                senderId: {
+                  $eq: receiverId,
+                },
+              },
+            ],
+          },
+        ],
+      });
+
+      responseReturn(res, 200, { messages });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
 }
 
 module.exports = new ChatController();

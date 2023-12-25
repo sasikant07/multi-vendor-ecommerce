@@ -8,11 +8,11 @@ const adminSellerMessageSchema = new Schema(
     },
     senderId: {
       type: String,
-      required: true,
+      default: "",
     },
     receiverId: {
       type: String,
-      required: true,
+      default: "",
     },
     message: {
       type: String,
