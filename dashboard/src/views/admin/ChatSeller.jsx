@@ -16,7 +16,7 @@ import { socket } from "../../utils/utils";
 
 const ChatSeller = () => {
   const scrollRef = useRef();
-  const { sellerId } = useParams;
+  const { sellerId } = useParams();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
   const {
@@ -138,13 +138,19 @@ const ChatSeller = () => {
                 <div className="flex justify-start items-center gap-3">
                   <div className="relative">
                     <img
-                      className="w-[42px] h-[42px] border-green-500 border-2 max-w-[38px] p-[2px] rounded-full"
+                      className={`w-[38px] h-[38px] ${
+                        activeSellers.some((a) => a.sellerId === sellerId)
+                          ? "border-green-500"
+                          : "border-none"
+                      } border-2 max-w-[38px] p-[2px] rounded-full`}
                       src="http://localhost:3030/images/admin.jpg"
                       alt=""
                     />
-                    <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
-                    <span className="text-white">{currentSeller?.name}</span>
+                    {activeSellers.some((a) => a.sellerId === sellerId) && (
+                      <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                    )}
                   </div>
+                  <span className="text-white">{currentSeller?.name}</span>
                 </div>
               )}
               <div

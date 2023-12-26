@@ -339,7 +339,7 @@ class ChatController {
 
   get_admin_messages = async (req, res) => {
     const { receiverId } = req.params;
-    const { id } = "";
+    const id = "";
 
     try {
       const messages = await adminSellerMessageModel.find({
