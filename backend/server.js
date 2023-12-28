@@ -154,7 +154,6 @@ app.use("/api/home", homeRoutes);
 app.use("/api", customerAuthRoutes);
 app.use("/api", cartRoutes);
 app.use("/api", orderRoutes);
-app.use("/api", orderRoutes);
 app.use("/api", chatRoutes);
 
 const port = process.env.PORT;

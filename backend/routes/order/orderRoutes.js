@@ -13,4 +13,8 @@ router.get(
 );
 router.get("/home/customer/get-order/:orderId", orderController.get_order);
 
+// admin API's
+router.get("/admin/orders", orderController.get_admin_orders);
+router.get("/admin/order/:orderId", orderController.get_admin_order);
+
 module.exports = router;

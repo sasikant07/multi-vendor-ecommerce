@@ -43,6 +43,7 @@ class OrderController {
       const pro = products[i].products;
       for (let j = 0; j < pro.length; j++) {
         let tempCusPro = pro[j].productInfo;
+        tempCusPro.quantity = pro[j].quantity;
         customerOrderProduct.push(tempCusPro);
 
         if (pro[j]._id) {
@@ -174,6 +175,74 @@ class OrderController {
       const order = await customerOrderModel.findById(orderId);
 
       responseReturn(res, 200, { order });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_admin_orders = async (req, res) => {
+    let { perPage, page, searchValue } = req.query;
+
+    page = parseInt(page);
+    perPage = parseInt(perPage);
+
+    const skipPage = perPage * (page - 1);
+
+    try {
+      if (searchValue) {
+      } else {
+        const orders = await customerOrderModel
+          .aggregate([
+            {
+              $lookup: {
+                from: "authorders",
+                localField: "_id",
+                foreignField: "orderId",
+                as: "suborder",
+              },
+            },
+          ])
+          .skip(skipPage)
+          .limit(perPage)
+          .sort({ createdAt: -1 });
+
+        const totalOrder = await customerOrderModel.aggregate([
+          {
+            $lookup: {
+              from: "authorders",
+              localField: "_id",
+              foreignField: "orderId",
+              as: "suborder",
+            },
+          },
+        ]);
+
+        responseReturn(res, 200, { orders, totalOrder: totalOrder.length });
+      }
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_admin_order = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+      const order = await customerOrderModel.aggregate([
+        {
+          $match: { _id: new ObjectId(orderId) },
+        },
+        {
+          $lookup: {
+            from: "authorders",
+            localField: "_id",
+            foreignField: "orderId",
+            as: "suborder",
+          },
+        },
+      ]);
+
+      responseReturn(res, 200, { order: order[0] });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }
