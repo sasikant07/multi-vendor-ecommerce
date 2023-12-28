@@ -6,7 +6,7 @@ const initialState = {
   errorMessage: "",
   loader: false,
   sellers: [],
-  totalSeller: 0,
+  totalSellers: 0,
   seller: "",
 };
 
@@ -55,6 +55,34 @@ export const seller_status_update = createAsyncThunk(
   }
 );
 
+export const get_active_sellers = createAsyncThunk(
+  "category/get-active-sellers",
+  async ({ perPage, page, searchValue }, thunkAPI) => {
+    try {
+      const { data } = await api.get(
+        `/get-sellers?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`
+      );
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const get_deactive_sellers = createAsyncThunk(
+  "category/get-deactive-sellers",
+  async ({ perPage, page, searchValue }, thunkAPI) => {
+    try {
+      const { data } = await api.get(
+        `/get-deactive-sellers?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`
+      );
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const sellerReducer = createSlice({
   name: "seller",
   initialState,
@@ -75,6 +103,14 @@ export const sellerReducer = createSlice({
     builder.addCase(seller_status_update.fulfilled, (state, action) => {
       state.seller = action.payload.seller;
       state.successMessage = action.payload.message;
+    });
+    builder.addCase(get_active_sellers.fulfilled, (state, action) => {
+      state.sellers = action.payload.sellers;
+      state.totalSellers = action.payload.totalSellers;
+    });
+    builder.addCase(get_deactive_sellers.fulfilled, (state, action) => {
+      state.sellers = action.payload.sellers;
+      state.totalSellers = action.payload.totalSellers;
     });
   },
 });

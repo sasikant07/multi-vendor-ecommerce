@@ -113,6 +113,22 @@ export const profile_info_add = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async ({ navigate, role }, thunkAPI) => {
+    try {
+      const { data } = await api.get("/logout", {
+        withCredentials: true,
+      });
+      localStorage.removeItem("accessToken");
+      role === "admin" ? navigate("/admin/login") : navigate("/login");
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const authReducer = createSlice({
   name: "auth",
   initialState,

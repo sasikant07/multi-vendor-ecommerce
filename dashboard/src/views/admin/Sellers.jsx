@@ -1,15 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import Pagination from "../Pagination";
+import { get_active_sellers } from "../../store/Reducers/sellerReducer";
 
 const Sellers = () => {
-  const { sellers, totalSeller } = useSelector((state) => state.seller);
+  const dispatch = useDispatch();
+  const { sellers, totalSellers } = useSelector((state) => state.seller);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [perPage, setPerPage] = useState(5);
-  const [show, setShow] = useState(false);
+  // const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const obj = {
+      perPage: parseInt(perPage),
+      page: parseInt(currentPage),
+      searchValue,
+    };
+    dispatch(get_active_sellers(obj));
+  }, [searchValue, currentPage, perPage]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -24,6 +35,8 @@ const Sellers = () => {
             <option value="25">25</option>
           </select>
           <input
+            onChange={(e) => setSearchValue(e.target.value)}
+            value={searchValue}
             className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
             type="text"
             placeholder="search"
@@ -81,13 +94,13 @@ const Sellers = () => {
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>{d.category}</span>
+                    <span>{d.name}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>{d.shopInfo.shopName}</span>
+                    <span>{d.shopInfo?.shopName}</span>
                   </td>
                   <td
                     scope="row"
@@ -105,13 +118,13 @@ const Sellers = () => {
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>{d.shopInfo.division}</span>
+                    <span>{d.shopInfo?.division}</span>
                   </td>
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>{d.shopInfo.district}</span>
+                    <span>{d.shopInfo?.district}</span>
                   </td>
                   <td
                     scope="row"
@@ -132,13 +145,17 @@ const Sellers = () => {
           </table>
         </div>
         <div className="w-full flex justify-end mt-4 bottom-4 right-4">
-          <Pagination
-            pageNumber={currentPage}
-            setPageNumber={setCurrentPage}
-            totalItem={50}
-            perPage={perPage}
-            showItem={3}
-          />
+          {totalSellers <= perPage ? (
+            ""
+          ) : (
+            <Pagination
+              pageNumber={currentPage}
+              setPageNumber={setCurrentPage}
+              totalItem={totalSellers}
+              perPage={perPage}
+              showItem={3}
+            />
+          )}
         </div>
       </div>
     </div>
