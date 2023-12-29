@@ -53,7 +53,7 @@ class ProductController {
           stock: parseInt(stock),
           price: parseInt(price),
           discount: parseInt(discount),
-          shopName: shopName[0].trim(),
+          shopName: shopName,
           images: allImageUrl,
         });
 

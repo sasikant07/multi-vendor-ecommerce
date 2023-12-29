@@ -83,7 +83,7 @@ const OrderDetails = () => {
             <div className="w-[68%]">
               <div className="pl-3">
                 <div className="mt-4 flex flex-col">
-                  {order?.suorder?.map((o, i) => (
+                  {order?.suborder?.map((o, i) => (
                     <div className="text-[#d0d2d6] mb-6" key={i}>
                       <div className="flex justify-start items-center gap-3">
                         <h2>Seller {i + 1} order: </h2>
