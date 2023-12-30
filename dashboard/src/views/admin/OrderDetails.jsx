@@ -1,16 +1,50 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { get_admin_order } from "../../store/Reducers/orderReducer";
+import toast from "react-hot-toast";
+import {
+  admin_order_status_update,
+  get_admin_order,
+  messageClear,
+} from "../../store/Reducers/orderReducer";
 import { useParams } from "react-router-dom";
 
 const OrderDetails = () => {
   const dispatch = useDispatch();
   const { orderId } = useParams();
-  const { order } = useSelector((state) => state.order);
+  const { order, successMessage, errorMessage } = useSelector(
+    (state) => state.order
+  );
+  const [status, setStatus] = useState("");
+
+  const status_update = (e) => {
+    dispatch(
+      admin_order_status_update({
+        orderId,
+        info: { status: e.target.value },
+      })
+    );
+    setStatus(e.target.value);
+  };
 
   useEffect(() => {
     dispatch(get_admin_order(orderId));
   }, [orderId]);
+
+  useEffect(() => {
+    setStatus(order?.delivery_status);
+  }, [order]);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -18,15 +52,17 @@ const OrderDetails = () => {
         <div className="flex justify-between items-center p-4">
           <h2 className="text-xl text-[#d0d2d6]">Order Details</h2>
           <select
+            onChange={status_update}
+            value={status}
             className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#283046] border border-slate-700 rounded-md text-[#d0d2d6]"
             name=""
             id=""
           >
-            <option value="">Pending</option>
-            <option value="">Processing</option>
-            <option value="">Warehouse</option>
-            <option value="">Placed</option>
-            <option value="">Cancelled</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Warehouse">Warehouse</option>
+            <option value="Placed">Placed</option>
+            <option value="Cancelled">Cancelled</option>
           </select>
         </div>
         <div className="p-4">
@@ -84,13 +120,13 @@ const OrderDetails = () => {
               <div className="pl-3">
                 <div className="mt-4 flex flex-col">
                   {order?.suborder?.map((o, i) => (
-                    <div className="text-[#d0d2d6] mb-6" key={i}>
+                    <div className="text-[#d0d2d6] mb-6" key={i + 20}>
                       <div className="flex justify-start items-center gap-3">
                         <h2>Seller {i + 1} order: </h2>
                         <span>{o.delivery_status}</span>
                       </div>
                       {o.products.map((p, i) => (
-                        <div className="flex gap-3 text-md mt-2">
+                        <div className="flex gap-3 text-md mt-2" key={i}>
                           <img
                             className="w-[45px] h-[45px]"
                             src={p.images[0]}

@@ -247,6 +247,83 @@ class OrderController {
       responseReturn(res, 500, { error: error.message });
     }
   };
+
+  admin_order_status_update = async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    try {
+      await customerOrderModel.findByIdAndUpdate(orderId, {
+        delivery_status: status,
+      });
+      responseReturn(res, 200, {
+        message: "Order status updated successfully",
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_seller_orders = async (req, res) => {
+    let { perPage, page, searchValue } = req.query;
+    const { sellerId } = req.params;
+
+    page = parseInt(page);
+    perPage = parseInt(perPage);
+
+    const skipPage = perPage * (page - 1);
+
+    try {
+      if (searchValue) {
+      } else {
+        const orders = await authOrderModel
+          .find({
+            sellerId,
+          })
+          .skip(skipPage)
+          .limit(perPage)
+          .sort({ createdAt: -1 });
+
+        const totalOrder = await authOrderModel
+          .find({
+            sellerId,
+          })
+          .countDocuments();
+
+        responseReturn(res, 200, { orders, totalOrder });
+      }
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_seller_order = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+      const order = await authOrderModel.findById(orderId);
+
+      responseReturn(res, 200, { order });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  seller_order_status_update = async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    try {
+      await authOrderModel.findByIdAndUpdate(orderId, {
+        delivery_status: status,
+      });
+      responseReturn(res, 200, {
+        message: "Order status updated successfully",
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
 }
 
 module.exports = new OrderController();
