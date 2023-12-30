@@ -116,7 +116,7 @@ const SellerRequest = () => {
             <Pagination
               pageNumber={currentPage}
               setPageNumber={setCurrentPage}
-              totalItem={50}
+              totalItem={totalSeller}
               perPage={perPage}
               showItem={3}
             />

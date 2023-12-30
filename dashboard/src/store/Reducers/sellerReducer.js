@@ -11,14 +11,11 @@ const initialState = {
 };
 
 export const get_seller_request = createAsyncThunk(
-  "category/get_seller_request",
+  "seller/get_seller_request",
   async ({ perPage, page, searchValue }, thunkAPI) => {
     try {
       const { data } = await api.get(
-        `/request-seller-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`,
-        {
-          withCredentials: true,
-        }
+        `/request-seller-get?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`
       );
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
@@ -28,12 +25,10 @@ export const get_seller_request = createAsyncThunk(
 );
 
 export const get_seller = createAsyncThunk(
-  "category/get_seller",
+  "seller/get_seller",
   async (sellerId, thunkAPI) => {
     try {
-      const { data } = await api.get(`/get-seller/${sellerId}`, {
-        withCredentials: true,
-      });
+      const { data } = await api.get(`/get-seller/${sellerId}`);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -42,12 +37,10 @@ export const get_seller = createAsyncThunk(
 );
 
 export const seller_status_update = createAsyncThunk(
-  "category/seller_status_update",
+  "seller/seller_status_update",
   async (info, thunkAPI) => {
     try {
-      const { data } = await api.post(`/seller-status-update`, info, {
-        withCredentials: true,
-      });
+      const { data } = await api.post(`/seller-status-update`, info);
       return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -56,7 +49,7 @@ export const seller_status_update = createAsyncThunk(
 );
 
 export const get_active_sellers = createAsyncThunk(
-  "category/get-active-sellers",
+  "seller/get-active-sellers",
   async ({ perPage, page, searchValue }, thunkAPI) => {
     try {
       const { data } = await api.get(
@@ -70,13 +63,26 @@ export const get_active_sellers = createAsyncThunk(
 );
 
 export const get_deactive_sellers = createAsyncThunk(
-  "category/get-deactive-sellers",
+  "seller/get-deactive-sellers",
   async ({ perPage, page, searchValue }, thunkAPI) => {
     try {
       const { data } = await api.get(
         `/get-deactive-sellers?page=${page}&&searchValue=${searchValue}&&perPage=${perPage}`
       );
       return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const create_stripe_connect_account = createAsyncThunk(
+  "seller/create-stripe-connect-account",
+  async (thunkAPI) => {
+    try {
+      const { data } = await api.get(`/payment/create-stripe-connect-account`);
+      window.location.href = data.url;
+      // return thunkAPI.fulfillWithValue(data);
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }

@@ -11,6 +11,7 @@ import {
   messageClear,
   profile_info_add,
 } from "../../store/Reducers/authReducer";
+import { create_stripe_connect_account } from "../../store/Reducers/sellerReducer";
 
 const initialState = {
   shopName: "",
@@ -25,7 +26,6 @@ const Profile = () => {
     (state) => state.auth
   );
   const [state, setState] = useState(initialState);
-  const status = "active";
 
   const add_image = (e) => {
     if (e.target.files.length > 0) {
@@ -53,6 +53,7 @@ const Profile = () => {
       dispatch(messageClear());
     }
   }, [successMessage]);
+
   return (
     <div className="px-2 lg:px-7 py-5">
       <div className="w-full flex flex-wrap">
@@ -122,12 +123,17 @@ const Profile = () => {
                 <div className="flex gap-2">
                   <span>Payment Account:</span>
                   <p>
-                    {status === "active" ? (
+                    {userInfo.payment === "active" ? (
                       <span className="bg-red-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
                         {userInfo.payment}
                       </span>
                     ) : (
-                      <span className="bg-blue-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
+                      <span
+                        onClick={() =>
+                          dispatch(create_stripe_connect_account())
+                        }
+                        className="bg-blue-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded"
+                      >
                         click active
                       </span>
                     )}

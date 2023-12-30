@@ -106,7 +106,7 @@ const Sellers = () => {
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <span>{d.status}</span>
+                    <span>{d.payment}</span>
                   </td>
                   <td
                     scope="row"
