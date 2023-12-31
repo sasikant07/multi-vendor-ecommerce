@@ -89,6 +89,21 @@ export const create_stripe_connect_account = createAsyncThunk(
   }
 );
 
+export const active_stripe_connect_account = createAsyncThunk(
+  "seller/active-stripe-connect-account",
+  async (activeCode, thunkAPI) => {
+    try {
+      const { data } = await api.put(
+        `/payment/active-stripe-connect-account/${activeCode}`,
+        {}
+      );
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const sellerReducer = createSlice({
   name: "seller",
   initialState,
@@ -117,6 +132,20 @@ export const sellerReducer = createSlice({
     builder.addCase(get_deactive_sellers.fulfilled, (state, action) => {
       state.sellers = action.payload.sellers;
       state.totalSellers = action.payload.totalSellers;
+    });
+    builder.addCase(active_stripe_connect_account.pending, (state) => {
+      state.loader = true;
+    });
+    builder.addCase(
+      active_stripe_connect_account.fulfilled,
+      (state, action) => {
+        state.loader = false;
+        state.successMessage = action.payload.message;
+      }
+    );
+    builder.addCase(active_stripe_connect_account.rejected, (state, action) => {
+      state.loader = false;
+      state.errorMessage = action.payload.message;
     });
   },
 });

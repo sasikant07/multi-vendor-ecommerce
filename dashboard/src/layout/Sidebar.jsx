@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { BiLogInCircle } from "react-icons/bi";
 import { getNavs } from "../navigation";
 import { logout } from "../store/Reducers/authReducer";
+import logo from "../assets/logo.png";
 
 const Sidebar = ({ showSidebar, setShowSidebar }) => {
   const { pathname } = useLocation();
@@ -33,7 +34,7 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
           <Link to="/" className="w-[180px] h-[50px]">
             <img
               className="w-full h-full"
-              src="http://localhost:3000/images/logo.png"
+              src={logo}
               alt=""
             />
           </Link>
@@ -57,7 +58,7 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
             ))}
             <li>
               <button
-                onClick={() => dispatch(logout({navigate, role}))}
+                onClick={() => dispatch(logout({ navigate, role }))}
                 className="text-[#d0d2d6] font-normal duration-200 px-[12px] py-[9px] rounded-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1"
               >
                 <span>
