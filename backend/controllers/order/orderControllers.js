@@ -6,6 +6,9 @@ const { responseReturn } = require("../../utils/response");
 const customerOrderModel = require("../../models/customerOrderModel");
 const authOrderModel = require("../../models/authOrderModel");
 const cartModel = require("../../models/cartModel");
+const stripe = require("stripe")(
+  "sk_test_51OTQNfCbH4s1f9nV6Ar9rB6RdS9FGNeWANBPI9FSkxjRyHVZ9gMjzGbCthrajPJ8bvRV6yA4R4UEls9V0NodYEQI00w0fBBd0Q"
+);
 
 class OrderController {
   paymentCheck = async (id) => {
@@ -320,6 +323,57 @@ class OrderController {
       responseReturn(res, 200, {
         message: "Order status updated successfully",
       });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  create_payment = async (req, res) => {
+    const { price } = req.body;
+
+    try {
+      const payment = await stripe.paymentIntents.create({
+        amount: price * 100,
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      responseReturn(res, 200, { clientSecret: payment.client_secret });
+    } catch (error) {
+      console.log(error);
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  order_confirm = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+      await customerOrderModel.findByIdAndUpdate(orderId, {
+        payment_status: "paid",
+        delivery_status: "pending",
+      });
+
+      await authOrderModel.updateMany(
+        { orderId: new ObjectId(orderId) },
+        {
+          payment_status: "paid",
+          delivery_status: "pending",
+        }
+      );
+
+      const cusOrder = await customerOrderModel.findById(orderId);
+
+      const authOrder = await authOrderModel.find({
+        orderId: new ObjectId(orderId),
+      });
+
+      const time = moment(Date.now()).format("l");
+
+      const splitTime = time.split("/");
+      
+      
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }

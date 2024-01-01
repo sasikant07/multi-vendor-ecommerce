@@ -5,7 +5,7 @@ import Stripe from "../components/Stripe";
 import { useLocation } from "react-router-dom";
 
 const Payment = () => {
-    const {state: {price, items}} = useLocation();
+    const {state: {price, items, orderId}} = useLocation();
   const [paymentMethod, setPaymentMethod] = useState("stripe");
   return (
     <div>
@@ -47,7 +47,7 @@ const Payment = () => {
                 </div>
                 {paymentMethod === "stripe" && (
                   <div>
-                    <Stripe />
+                    <Stripe price={price} orderId={orderId} />
                   </div>
                 )}
                 {paymentMethod === "paypal" && (
