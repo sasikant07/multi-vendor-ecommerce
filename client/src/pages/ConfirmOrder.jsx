@@ -22,27 +22,25 @@ const ConfirmOrder = () => {
   };
 
   useEffect(() => {
-    if (stripe) {
+    if (!stripe) {
       return;
     }
-
     const clientSecret = new URLSearchParams(window.location.search).get(
       "payment_intent_client_secret"
     );
-
     if (!clientSecret) {
       return;
     }
-    stripe.retrivePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent.status) {
         case "succeeded":
-          setMessage("Succeeded!");
+          setMessage("succeeded");
           break;
         case "processing":
-          setMessage("processing!");
+          setMessage("processing");
           break;
         case "requires_payment_method":
-          setMessage("failed!");
+          setMessage("failed");
           break;
         default:
           setMessage("failed");
