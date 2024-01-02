@@ -6,6 +6,8 @@ const { responseReturn } = require("../../utils/response");
 const customerOrderModel = require("../../models/customerOrderModel");
 const authOrderModel = require("../../models/authOrderModel");
 const cartModel = require("../../models/cartModel");
+const myShopWalletModel = require("../../models/myShopWalletModel");
+const sellerWalletModel = require("../../models/sellerWalletModel");
 const stripe = require("stripe")(
   "sk_test_51OTQNfCbH4s1f9nV6Ar9rB6RdS9FGNeWANBPI9FSkxjRyHVZ9gMjzGbCthrajPJ8bvRV6yA4R4UEls9V0NodYEQI00w0fBBd0Q"
 );
@@ -372,8 +374,24 @@ class OrderController {
       const time = moment(Date.now()).format("l");
 
       const splitTime = time.split("/");
-      
-      
+
+      await myShopWalletModel.create({
+        amount: cusOrder.price,
+        month: splitTime[0],
+        year: splitTime[2],
+      });
+
+      // Split amount to different sellers
+      for (let i = 0; i < authOrder.length; i++) {
+        await sellerWalletModel.create({
+          sellerId: authOrder[i].sellerId.toString(),
+          amount: authOrder[i].price,
+          month: splitTime[0],
+          year: splitTime[2],
+        });
+      }
+
+      responseReturn(res, 200, { message: "Success" });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }

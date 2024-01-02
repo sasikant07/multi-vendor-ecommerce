@@ -57,9 +57,7 @@ const ConfirmOrder = () => {
 
     if (orderId) {
       try {
-        const { data } = await axios.get(
-          `http://localhost:8080/api/order/confirm/${orderId}`
-        );
+        await axios.get(`http://localhost:8080/api/order/confirm/${orderId}`);
         localStorage.removeItem("orderId");
         setLoader(false);
       } catch (error) {
