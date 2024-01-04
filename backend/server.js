@@ -14,6 +14,7 @@ const customerAuthRoutes = require("./routes/home/customerAuthRoutes");
 const cartRoutes = require("./routes/home/cartRoutes");
 const orderRoutes = require("./routes/order/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const dashboardIndexRoutes = require("./routes/dashboard/dashboardIndexRoutes");
 const { dbConnect } = require("./utils/db");
 const socket = require("socket.io");
 dotenv.config();
@@ -157,6 +158,7 @@ app.use("/api", cartRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", paymentRoutes);
+app.use("/api", dashboardIndexRoutes);
 
 const port = process.env.PORT;
 dbConnect();

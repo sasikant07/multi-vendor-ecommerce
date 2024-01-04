@@ -16,16 +16,16 @@ class OrderController {
   paymentCheck = async (id) => {
     try {
       const order = await customerOrderModel.findById(id);
-      if (order.payment_status === "Unpaid") {
+      if (order.payment_status === "unpaid") {
         await customerOrderModel.findByIdAndUpdate(id, {
-          delivery_status: "Cancelled",
+          delivery_status: "cancelled",
         });
         await authOrderModel.updateMany(
           {
             orderId: id,
           },
           {
-            delivery_status: "Cancelled",
+            delivery_status: "cancelled",
           }
         );
       }
@@ -62,8 +62,8 @@ class OrderController {
         shippingInfo,
         products: customerOrderProduct,
         price: price + shipping_fee,
-        delivery_status: "Pending",
-        payment_status: "Unpaid",
+        delivery_status: "pending",
+        payment_status: "unpaid",
         date: tempDate,
       });
 
@@ -84,7 +84,7 @@ class OrderController {
           sellerId,
           products: storePro,
           price: pri,
-          payment_status: "Unpaid",
+          payment_status: "unpaid",
           shippingInfo: "#New York Warehouse",
           delivery_status: "Pending",
           date: tempDate,
@@ -129,14 +129,14 @@ class OrderController {
       const pendingOrder = await customerOrderModel
         .find({
           customerId: new ObjectId(userId),
-          delivery_status: "Pending",
+          delivery_status: "pending",
         })
         .countDocuments();
 
       const cancelledOrder = await customerOrderModel
         .find({
           customerId: new ObjectId(userId),
-          delivery_status: "Cancelled",
+          delivery_status: "cancelled",
         })
         .countDocuments();
 

@@ -1,5 +1,13 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { FixedSizeList as List } from "react-window";
+import toast from "react-hot-toast";
+import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  confirm_payment_request,
+  get_payment_request,
+  messageClear,
+} from "../../store/Reducers/paymentReducer";
 
 function handleOnWheel({ deltaY }) {
   console.log("HangleOnWheel", deltaY);
@@ -10,25 +18,70 @@ const outerElementType = forwardRef((props, ref) => (
 ));
 
 const PaymentRequest = () => {
+  const dispatch = useDispatch();
+  const {
+    errorMessage,
+    successMessage,
+    loader,
+    pendingWithdraws,
+    successWithDraws,
+    totalAmount,
+    withdrawnAmount,
+    pendingAmount,
+    availableAmount,
+  } = useSelector((state) => state.payment);
+  const [paymentId, setPaymentId] = useState("");
+
+  const confirm_request = (id) => {
+    setPaymentId(id);
+    dispatch(confirm_payment_request(id));
+  };
+
   const Row = ({ index, style }) => {
     return (
       <div style={style} className="flex text-sm">
         <div className="w-[25%] p-2 whitespace-nowrap">{index + 1}</div>
-        <div className="w-[25%] p-2 whitespace-nowrap">$252</div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          ${pendingWithdraws[index]?.amount}
+        </div>
         <div className="w-[25%] p-2 whitespace-nowrap">
           <span className="py-[1px] px-[5px] bg-slate-700 text-blue-500 rounded-md text-xs">
-            Pending
+            {pendingWithdraws[index]?.status}
           </span>
         </div>
-        <div className="w-[25%] p-2 whitespace-nowrap">12 Jul 2023</div>
         <div className="w-[25%] p-2 whitespace-nowrap">
-          <button className="bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 px-3 py-[2px] cursor-pointer text-white rounded-sm text-sm">
-            Confirm
+          {moment(pendingWithdraws[index]?.createdAt).format("LL")}
+        </div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          <button
+            disabled={loader}
+            onClick={() => confirm_request(pendingWithdraws[index]?._id)}
+            className="bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 px-3 py-[2px] cursor-pointer text-white rounded-sm text-sm"
+          >
+            {loader && paymentId === pendingWithdraws[index]?._id
+              ? "Loading..."
+              : "Confirm"}
           </button>
         </div>
       </div>
     );
   };
+
+  useEffect(() => {
+    dispatch(get_payment_request());
+  }, []);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [errorMessage, successMessage]);
+
   return (
     <div className="px-2 lg:px-7 pt-5">
       <div className="w-full p-4 bg-[#283046] rounded-md text-[#d0d2d6]">
@@ -47,7 +100,7 @@ const PaymentRequest = () => {
                 style={{ minWidth: "340px", overflowX: "hidden" }}
                 className="List"
                 height={350}
-                itemCount={200000}
+                itemCount={pendingWithdraws.length}
                 itemSize={35}
                 outerElementType={outerElementType}
               >

@@ -1,10 +1,12 @@
 import React, { forwardRef, useEffect, useState } from "react";
 import { FixedSizeList as List } from "react-window";
+import moment from "moment";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {
   get_admin_payment_details,
+  messageClear,
   send_withdrawl_request,
 } from "../../store/Reducers/paymentReducer";
 
@@ -32,17 +34,40 @@ const Payments = () => {
   } = useSelector((state) => state.payment);
   const [amount, setAmount] = useState(0);
 
-  const Row = ({ index, style }) => {
+  const PendingWithdrawRow = ({ index, style }) => {
     return (
       <div style={style} className="flex text-sm">
         <div className="w-[25%] p-2 whitespace-nowrap">{index + 1}</div>
-        <div className="w-[25%] p-2 whitespace-nowrap">$252</div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          ${pendingWithdraws[index]?.amount}
+        </div>
         <div className="w-[25%] p-2 whitespace-nowrap">
           <span className="py-[1px] px-[5px] bg-slate-700 text-blue-500 rounded-md text-xs">
-            Pending
+            {pendingWithdraws[index]?.status}
           </span>
         </div>
-        <div className="w-[25%] p-2 whitespace-nowrap">12 Jul 2023</div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          {moment(pendingWithdraws[index]?.createdAt).format("LL")}
+        </div>
+      </div>
+    );
+  };
+
+  const SuccessWithdrawRow = ({ index, style }) => {
+    return (
+      <div style={style} className="flex text-sm">
+        <div className="w-[25%] p-2 whitespace-nowrap">{index + 1}</div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          ${successWithDraws[index]?.amount}
+        </div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          <span className="py-[1px] px-[5px] bg-slate-700 text-blue-500 rounded-md text-xs">
+            {successWithDraws[index]?.status}
+          </span>
+        </div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          {moment(successWithDraws[index]?.createdAt).format("LL")}
+        </div>
       </div>
     );
   };
@@ -50,8 +75,14 @@ const Payments = () => {
   const sendRequest = (e) => {
     e.preventDefault();
 
-    dispatch(send_withdrawl_request({ amount, sellerId: userInfo._id }));
-    setAmount(0);
+    if (amount <= 0) {
+      toast.error("Request amount should be greater than 0");
+    } else if (availableAmount - amount > 10) {
+      dispatch(send_withdrawl_request({ amount, sellerId: userInfo._id }));
+      setAmount(0);
+    } else {
+      toast.error("Insufficint balance");
+    }
   };
 
   useEffect(() => {
@@ -61,10 +92,12 @@ const Payments = () => {
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
+      dispatch(messageClear());
     }
 
     if (errorMessage) {
       toast.error(errorMessage);
+      dispatch(messageClear());
     }
   }, [successMessage, errorMessage]);
 
@@ -147,11 +180,11 @@ const Payments = () => {
                     style={{ minWidth: "340px", overflowX: "hidden" }}
                     className="List"
                     height={350}
-                    itemCount={100}
+                    itemCount={pendingWithdraws.length}
                     itemSize={35}
                     outerElementType={outerElementType}
                   >
-                    {Row}
+                    {PendingWithdrawRow}
                   </List>
                 }
               </div>
@@ -174,11 +207,11 @@ const Payments = () => {
                     style={{ minWidth: "340px", overflowX: "hidden" }}
                     className="List"
                     height={350}
-                    itemCount={100}
+                    itemCount={successWithDraws.length}
                     itemSize={35}
                     outerElementType={outerElementType}
                   >
-                    {Row}
+                    {SuccessWithdrawRow}
                   </List>
                 }
               </div>

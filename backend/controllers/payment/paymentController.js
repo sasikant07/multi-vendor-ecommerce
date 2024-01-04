@@ -8,6 +8,9 @@ const stripe = require("stripe")(
 );
 const { v4: uuidv4 } = require("uuid");
 const { responseReturn } = require("../../utils/response");
+const {
+  mongo: { ObjectId },
+} = require("mongoose");
 
 class PaymentController {
   sumAmount = (data) => {
@@ -129,7 +132,7 @@ class PaymentController {
       let availableAmount = 0;
 
       if (totalAmount > 0) {
-        availableAmount = totalAmount - (pendingAmount - withdrawnAmount);
+        availableAmount = totalAmount - (pendingAmount + withdrawnAmount);
       }
 
       responseReturn(res, 200, {
@@ -154,7 +157,47 @@ class PaymentController {
         amount: parseInt(amount),
       });
 
-      responseReturn(res, 200, { withdrawl, message: "Withdrawl amount request sent" });
+      responseReturn(res, 200, {
+        withdrawl,
+        message: "Withdrawl amount request sent",
+      });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  get_payment_request = async (req, res) => {
+    try {
+      const withdrawlRequest = await withdrawRequestModel.find({
+        status: "pending",
+      });
+
+      responseReturn(res, 200, { withdrawlRequest });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+
+  confirm_payment_request = async (req, res) => {
+    const { paymentId } = req.body;
+
+    try {
+      const payment = await withdrawRequestModel.findById(paymentId);
+      const { stripeId } = await stripeModel.findOne({
+        sellerId: new ObjectId(payment.sellerId),
+      });
+
+      await stripe.transfers.create({
+        amount: payment.amount * 100,
+        currency: "usd",
+        destination: stripeId,
+      });
+
+      await withdrawRequestModel.findByIdAndUpdate(paymentId, {
+        status: "success",
+      });
+
+      responseReturn(res, 200, { payment, message: "request confirm success" });
     } catch (error) {
       responseReturn(res, 500, { error: error.message });
     }

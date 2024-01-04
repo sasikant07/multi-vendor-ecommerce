@@ -39,6 +39,33 @@ export const send_withdrawl_request = createAsyncThunk(
   }
 );
 
+export const get_payment_request = createAsyncThunk(
+  "payment/get-payment-request",
+  async (_, thunkAPI) => {
+    try {
+      const { data } = await api.get(`/payment/get-payment-request`);
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const confirm_payment_request = createAsyncThunk(
+  "payment/confirm-payment-request",
+  async (paymentId, thunkAPI) => {
+    try {
+      const { data } = await api.post(
+        `/payment/confirm-payment-request`,
+        { paymentId }, { withCredentials: true }
+      );
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const paymentReducer = createSlice({
   name: "payment",
   initialState,
@@ -67,10 +94,29 @@ const paymentReducer = createSlice({
         ...state.pendingWithdraws,
         action.payload.withdrawl,
       ];
-      state.availableAmount = state.availableAmount - action.payload.withdrawl.amount;
+      state.availableAmount =
+        state.availableAmount - action.payload.withdrawl.amount;
       state.pendingAmount = action.payload.withdrawl.amount;
     });
     builder.addCase(send_withdrawl_request.rejected, (state, action) => {
+      state.loader = false;
+      state.errorMessage = action.payload.error;
+    });
+    builder.addCase(get_payment_request.fulfilled, (state, action) => {
+      state.pendingWithdraws = action.payload.withdrawlRequest;
+    });
+    builder.addCase(confirm_payment_request.pending, (state) => {
+      state.loader = true;
+    });
+    builder.addCase(confirm_payment_request.fulfilled, (state, action) => {
+      const temp = state.pendingWithdraws.filter(
+        (r) => r._id !== action.payload.payment._id
+      );
+      state.loader = false;
+      state.successMessage = action.payload.message;
+      state.pendingWithdraws = temp;
+    });
+    builder.addCase(confirm_payment_request.rejected, (state, action) => {
       state.loader = false;
       state.errorMessage = action.payload.error;
     });
