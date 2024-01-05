@@ -1,9 +1,24 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { FaFacebookF, FaLinkedin } from "react-icons/fa";
-import { AiFillGithub, AiOutlineTwitter } from "react-icons/ai";
+import {
+  AiFillGithub,
+  AiOutlineTwitter,
+  AiFillShopping,
+  AiFillHeart,
+} from "react-icons/ai";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 const Footer = () => {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { categories } = useSelector((state) => state.home);
+  const { cart_product_count, wishlist_count } = useSelector(
+    (state) => state.cart
+  );
+  const { userInfo } = useSelector((state) => state.auth);
+
   return (
     <footer className="bg-[#F3F6Fa]">
       <div className="w-[85%] flex flex-wrap mx-auto border-b py-16 md-lg:pb-10 sm:pb-6">
@@ -124,6 +139,38 @@ const Footer = () => {
             Sasikant Biswal
           </a>
         </span>
+      </div>
+      <div className="hidden fixed md-lg:block w-[50px] bottom-3 h-[110px] right-2 bg-white rounded-full p-2">
+        <div className="w-full h-full flex gap-3 flex-col justify-center items-center">
+          <div
+            onClick={() => navigate(userInfo ? "/cart" : "/login")}
+            className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
+          >
+            <span className="text-xl text-orange-500 ">
+              <AiFillShopping />
+            </span>
+            {cart_product_count !== 0 && (
+              <div className="w-[20px] h-[20px] absolute bg-green-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] text-[12px]">
+                {cart_product_count}
+              </div>
+            )}
+          </div>
+          <div
+            onClick={() =>
+              navigate(userInfo ? "/dashboard/my-wishlist" : "/login")
+            }
+            className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
+          >
+            <span className="text-xl text-red-500 ">
+              <AiFillHeart />
+            </span>
+            {wishlist_count !== 0 && (
+              <div className="w-[20px] h-[20px] absolute bg-green-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px] text-[12px]">
+                {wishlist_count}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </footer>
   );

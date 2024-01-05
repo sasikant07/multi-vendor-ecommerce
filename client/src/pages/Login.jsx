@@ -121,6 +121,18 @@ const Login = () => {
                   </Link>
                 </p>
               </div>
+              <div className="text-center text-slate-600 pt-1">
+                <p>
+                  <a
+                    href="http://localhost:3030/register"
+                    target="_blank"
+                    className="text-blue-500"
+                  >
+                    Register
+                  </a>{" "}
+                  as Seller
+                </p>
+              </div>
             </div>
             <div className="w-full h-full py-4 pr-4">
               <img
