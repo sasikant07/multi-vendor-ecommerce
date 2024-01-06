@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Search from "../components/Search";
+import { HiViewBoards } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import Pagination from "../Pagination";
@@ -144,6 +145,12 @@ const Products = () => {
                       <button className="p-[6px] bg-red-500 rounded-sm hover:shadow-lg hover:shadow-yellow-500/50">
                         <FaTrash />
                       </button>
+                      <Link
+                        to={`/seller/dashboard/add-banner/${d._id}`}
+                        className="p-[6px] bg-cyan-500 rounded-sm hover:shadow-lg hover:shadow-yellow-500/50"
+                      >
+                        <HiViewBoards />
+                      </Link>
                     </div>
                   </td>
                 </tr>

@@ -3,6 +3,7 @@ import { BiCategory, BiLoaderCircle } from "react-icons/bi";
 import { FiUsers, FiUser } from "react-icons/fi";
 import { BsCurrencyDollar, BsChat } from "react-icons/bs";
 import { CiChat1, CiDiscount1 } from "react-icons/ci";
+import { TiBusinessCard } from "react-icons/ti";
 import { RiProductHuntLine } from "react-icons/ri";
 
 export const allNav = [
@@ -84,42 +85,49 @@ export const allNav = [
     path: "/seller/dashboard/products",
   },
   {
-    id: 12,
+    id: 13,
+    title: "All Banner",
+    icon: <TiBusinessCard />,
+    role: "seller",
+    path: "/seller/dashboard/banners",
+  },
+  {
+    id: 14,
     title: "Discount Products",
     icon: <CiDiscount1 />,
     role: "seller",
     path: "/seller/dashboard/discount-products",
   },
   {
-    id: 13,
+    id: 15,
     title: "Orders",
     icon: <AiOutlineShoppingCart />,
     role: "seller",
     path: "/seller/dashboard/orders",
   },
   {
-    id: 14,
+    id: 16,
     title: "Payments",
     icon: <BsCurrencyDollar />,
     role: "seller",
     path: "/seller/dashboard/payments",
   },
   {
-    id: 15,
+    id: 17,
     title: "Chat Customer",
     icon: <BsChat />,
     role: "seller",
     path: "/seller/dashboard/chat-customer",
   },
   {
-    id: 16,
+    id: 18,
     title: "Chat Support",
     icon: <CiChat1 />,
     role: "seller",
     path: "/seller/dashboard/chat-support",
   },
   {
-    id: 17,
+    id: 19,
     title: "Profile",
     icon: <FiUser />,
     role: "seller",

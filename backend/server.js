@@ -14,6 +14,7 @@ const customerAuthRoutes = require("./routes/home/customerAuthRoutes");
 const cartRoutes = require("./routes/home/cartRoutes");
 const orderRoutes = require("./routes/order/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const bannerRoutes = require("./routes/bannerRoutes");
 const dashboardIndexRoutes = require("./routes/dashboard/dashboardIndexRoutes");
 const { dbConnect } = require("./utils/db");
 const socket = require("socket.io");
@@ -159,6 +160,7 @@ app.use("/api", orderRoutes);
 app.use("/api", chatRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api", dashboardIndexRoutes);
+app.use("/api", bannerRoutes);
 
 const port = process.env.PORT;
 dbConnect();
