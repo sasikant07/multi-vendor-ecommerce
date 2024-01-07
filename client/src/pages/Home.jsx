@@ -16,6 +16,7 @@ const Home = () => {
     latest_product,
     topRated_product,
     discount_product,
+    banners,
   } = useSelector((state) => state.home);
 
   useEffect(() => {

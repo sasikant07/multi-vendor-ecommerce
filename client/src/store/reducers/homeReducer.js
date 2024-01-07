@@ -21,6 +21,7 @@ const initialState = {
   totalReview: 0,
   reviews: [],
   rating_review: [],
+  banners: [],
 };
 
 export const get_category = createAsyncThunk(
@@ -117,6 +118,18 @@ export const get_reviews = createAsyncThunk(
   }
 );
 
+export const get_banners = createAsyncThunk(
+  "product/get-banners",
+  async (_, thunkAPI) => {
+    try {
+      const { data } = await api.get("/banners");
+      return thunkAPI.fulfillWithValue(data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const homeReducer = createSlice({
   name: "home",
   initialState,
@@ -161,6 +174,9 @@ const homeReducer = createSlice({
       state.reviews = action.payload.reviews;
       state.totalReview = action.payload.totalReview;
       state.rating_review = action.payload.rating_review;
+    });
+    builder.addCase(get_banners.fulfilled, (state, action) => {
+      state.banners = action.payload.banners;
     });
   },
 });

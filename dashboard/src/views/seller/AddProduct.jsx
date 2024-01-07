@@ -20,10 +20,8 @@ const initialState = {
 
 const AddProduct = () => {
   const dispatch = useDispatch();
-  const { categories } = useSelector(
-    (state) => state.category
-  );
-  const { loader, successMessage, errorMessage,  } = useSelector(
+  const { categories } = useSelector((state) => state.category);
+  const { loader, successMessage, errorMessage } = useSelector(
     (state) => state.product
   );
   const [state, setState] = useState(initialState);
@@ -101,7 +99,7 @@ const AddProduct = () => {
     formData.append("stock", state.stock);
     formData.append("shopName", "ABC Fashion");
 
-    for(let i = 0; i < images.length; i++) {
+    for (let i = 0; i < images.length; i++) {
       formData.append("images", images[i]);
     }
 
@@ -321,19 +319,16 @@ const AddProduct = () => {
               />
             </div>
             <div className="flex ">
-            <button
-                    disabled={loader ? true : false}
-                    className="bg-blue-500 w-[190px] hover:shadow-blue-500/20 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3"
-                  >
-                    {loader ? (
-                      <PropagateLoader
-                        color="#fff"
-                        cssOverride={overrideStyle}
-                      />
-                    ) : (
-                      "Add Product"
-                    )}
-                  </button>
+              <button
+                disabled={loader ? true : false}
+                className="bg-blue-500 w-[190px] hover:shadow-blue-500/20 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3"
+              >
+                {loader ? (
+                  <PropagateLoader color="#fff" cssOverride={overrideStyle} />
+                ) : (
+                  "Add Product"
+                )}
+              </button>
             </div>
           </form>
         </div>

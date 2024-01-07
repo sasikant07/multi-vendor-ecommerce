@@ -1,27 +1,36 @@
 import React from "react";
+import { useEffect } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { get_banners } from "../store/reducers/homeReducer";
 
 const Banner = () => {
-    const responsive = {
-        superLargeDesktop: {
-            breakpoint: {max: 4000, min: 3000},
-            items: 1,
-        },
-        desktop: {
-            breakpoint: {max: 3000, min: 1024},
-            items: 1,
-        },
-        tablet: {
-            breakpoint: {max: 1024, min: 464},
-            items: 1,
-        },
-        mobile: {
-            breakpoint: {max: 464, min: 0},
-            items: 1,
-        },
-    }
+  const dispatch = useDispatch();
+  const { banners } = useSelector((state) => state.home);
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 1,
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 1,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 1,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+    },
+  };
+
+  useEffect(() => {
+    dispatch(get_banners());
+  }, []);
   return (
     <div className="w-full md-lg:mt-6">
       <div className="w-[85%] lg:w-[90%] mx-auto">
@@ -35,11 +44,16 @@ const Banner = () => {
                 showDots={true}
                 responsive={responsive}
               >
-                {[1, 2, 3, 4, 5].map((img, i) => (
-                  <Link to="#" key={i} className="lg-md:h-[440px] h-auto w-full block">
-                    <img src={`http://localhost:3000/images/banner/${img}.jpg`} alt="" />
-                  </Link>
-                ))}
+                {banners.length > 0 &&
+                  banners.map((b, i) => (
+                    <Link
+                      to={`/product/details/${b.link}`}
+                      key={i}
+                      className="lg-md:h-[440px] h-auto w-full block"
+                    >
+                      <img src={b.banner} alt="" />
+                    </Link>
+                  ))}
               </Carousel>
             </div>
           </div>
